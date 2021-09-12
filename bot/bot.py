@@ -26,14 +26,8 @@ server_ip = data["properties"]["server_ip"]
 
 
 
-client = commands.Bot(command_prefix=PREFIX)
+client = commands.Bot(command_prefix=PREFIX, help_command=None)
 
-
-
-@client.event
-async def on_ready():
-    print("Kahlifar: logged in")
-    client.loop.create_task(status_task())
 
 
 async def status_task():
@@ -43,20 +37,33 @@ async def status_task():
         for x in range(len(messages)):
             await client.change_presence(activity=discord.Game(messages[x]), status=discord.Status.online)
             await asyncio.sleep(time)
+
             
 
 @client.event
-async def on_member_join(member):
-    print("New Member")
-    await client.send_message(member,"Welcome!")
+async def on_ready():
+    print("Kahlifar: logged in")
+    client.loop.create_task(status_task())            
 
-@client.command(aliases=['dc_link', 'dc'])
+# @client.event
+# async def on_member_join(member):
+#     print("New Member")
+#     await client.send_message(member,"Welcome!")
+
+
+
+@client.command(aliases=list(data["properties"]["commands"]["help"]["aliases"]))
+async def help(ctx):
+    await ctx.channel.send("Command information comming soon")
+
+
+@client.command(aliases=list(data["properties"]["commands"]["discord_link"]["aliases"]))
 async def discord_link(ctx):
     await ctx.channel.send(data["properties"]["discord_link"])
 
-@client.command(aliases=['h'])
-async def help(ctx):
-    await ctx.channel.send(data)
+@client.command(aliases=list(data["properties"]["commands"]["server_ip"]["aliases"]))
+async def server_ip(ctx):
+    await ctx.channel.send(data["properties"]["server_ip"])
 
 
 
