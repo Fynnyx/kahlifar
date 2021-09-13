@@ -1,0 +1,23 @@
+{
+    "embed": {
+      "title": "Regeln auf dem Discord und Mincraft Server",
+      "description": "`Was passiert bei Regelbruch`",
+      "color": "0x9013fe",
+      "fields": [
+        {
+          "name": "Regel 1",
+          "value": "Kahlifar ist uhrsprünglich ein Minecraft Projekt. Heute ist es mehr eine Community die zusammen jegliche Spiele, von verschiedesten Mincraft Minispielen über Valorant bis zum Landwirtschafts Simmulator. Wir sind offen für neues."
+        },
+        {
+          "name": "Regel 2",
+          "value": "try exceeding some of them!",
+          "inline" : false
+        },
+        {
+          "name": "🙄",
+          "value": "an informative error should show up, and this view will remain as-is until all issues are fixed",
+          "inline": false
+        }
+      ]
+    }
+  }

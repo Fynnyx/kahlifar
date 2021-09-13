@@ -1,0 +1,5 @@
+Hello guys
+I think i am not the first one who asked this. But i hve problems with the command extension and the on_message function.
+After searching online i added `await client.process_commands(message)` but it still won't work.
+
+Does anyone know how to fix this?
