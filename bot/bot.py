@@ -1,15 +1,7 @@
-from asyncio.protocols import DatagramProtocol
-from os import name
-from re import T
 import discord
-from discord import embeds
-from discord import channel
-from discord import message
-from discord import colour
 
 from discord.ext import commands
 from discord.ext.commands import has_permissions, MissingPermissions, CheckFailure
-from discord.ext.commands.bot import Bot
 from discord.member import Member
 
 # from discord_slash import SlashCommand, SlashContext
