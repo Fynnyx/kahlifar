@@ -1,0 +1,103 @@
+{
+    "properties": {
+        "token": "",
+        "prefix": "-",
+        "discord_link": "https://discord.gg/Ym9tV5Udfc",
+        "server_ip": "test.play-mc.de",
+        "status": {
+            "time": 7,
+            "messages": [
+                "DiscordLink: https://discord.gg/Ym9tV5Udfc",
+                "ServerIP: test.play-mc.de",
+                "NEWS: Server startet am XX.XX.XXXX"
+            ]
+        },
+        "commands": {
+            "help": {
+                "description": "Show all available commands with description.",
+                "aliases": [
+                    "h"
+                ],
+                "permissions": [
+                    "Everyone"
+                ],
+                "inline": false
+            },
+            "discord_link": {
+                "description": "Send you the invitation link to this Discord Server.",
+                "aliases": [
+                    "dc_link",
+                    "dc"
+                ],
+                "permissions": [
+                    "Everyone"
+                ],
+                "inline": false
+            },
+            "server_ip": {
+                "description": "Send you the Server-IP from the Mincraft Server.",
+                "aliases": [
+                    "ip",
+                    "s_ip",
+                    "srv_ip"
+                ],
+                "permissions": [
+                    "Everyone"
+                ],
+                "inline": false
+            },
+            "social_media": {
+                "description": "Gives you all socialmedia links.",
+                "aliases": [
+                    "socialmedia",
+                    "sm"
+                ],
+                "permissions": [
+                    "Everyone"
+                ],
+                "inline": false
+            },
+            "clear": {
+                "description": "Delete messages. `clear, clear [amount], clear all`.",
+                "aliases": [],
+                "permissions": [
+                    "Helper",
+                    "Moderator",
+                    "Owner"
+                ],
+                "inline": false
+            },
+            "join": {
+                "description": "The Bot joins your channel",
+                "aliases": [
+                    "j"
+                ],
+                "permissions": [
+                    "Everyone"
+                ],
+                "inline": false
+            },
+            "leave": {
+                "description": "The Bot leaves your channel",
+                "aliases": [
+                    "l"
+                ],
+                "permissions": [
+                    "Everyone"
+                ],
+                "inline": false
+            },
+            "sound_board": {
+                "description": "Sends you the Soundboard",
+                "aliases": [
+                    "sb"
+                ],
+                "permissions": [
+                    "Everyone"
+                ],
+                "inline": false
+            }
+            
+        }
+    }
+}
