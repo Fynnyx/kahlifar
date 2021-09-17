@@ -132,3 +132,4 @@ dmypy.json
 
 #OWN
 /bot/properties.json
+/bot/musicbot/properties.json
