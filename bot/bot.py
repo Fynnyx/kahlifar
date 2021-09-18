@@ -74,8 +74,8 @@ async def send_error(error, channel):
 @client.event
 async def on_ready():
     print("Kahlifar: logged in")
-    # client.loop.create_task(status_task())
-    await client.change_presence(discord.CustomActivity(name="Test", type=discord.ActivityType.streaming))
+    client.loop.create_task(status_task())
+    # await client.change_presence(discord.CustomActivity(name="Test", type=discord.ActivityType.streaming))
 
 
 # Moderator ---------------------------------------------------------------------------
@@ -140,7 +140,6 @@ async def send_deleted_msgs(amount, channel):
 @client.command(pass_context=True, aliases=list(data["properties"]["commands"]["help"]["aliases"]))
 async def help(ctx:SlashContext):
     await send_help_embed(ctx)
-    # await ctx.channel.send("HELP TEST")
 
 async def send_help_embed(ctx):
     help_embed = discord.Embed(title="Hilfe für den %s." % str(client.user.name),
