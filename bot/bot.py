@@ -1,11 +1,8 @@
-from os import name
-import re
 import discord
 from discord import FFmpegPCMAudio
 
 from discord.ext.commands.core import check
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions, CheckFailure
 
 
 import discord.utils

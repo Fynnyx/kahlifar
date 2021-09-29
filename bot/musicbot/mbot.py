@@ -25,7 +25,6 @@ async def status_task():
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
 
-
 # On Ready ---------------------------------------------------------------------------
 
 @client.event
