@@ -1,4 +1,5 @@
 import discord
+from discord.ext.commands.errors import MissingRequiredArgument
 import discord.utils
 from discord.ext import commands
 import asyncio
@@ -25,6 +26,19 @@ async def status_task():
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
 
+async def play_queue(ctx):
+    while True:
+        # guild=client.get_guild(data["properties"]["guild"])
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        if voice:
+            if not voice.is_playing():
+                # print("is not playing")
+                await play_audio(ctx.guild)
+            # else:
+            #     # print("is playing")
+            #     return
+
+
 # On Ready ---------------------------------------------------------------------------
 
 @client.event
@@ -49,30 +63,36 @@ async def on_ready():
 
 # Events ---------------------------------------------------------------------------
 
-@client.event
-async def voice_handler(ctx):
-    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if voice:
-        while voice.is_playing() == False and voice.is_connected() == True and queue != []:
-            await play_audio(ctx)
+# @client.event
+# async def voice_handler(ctx):
+#     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+#     if voice:
+#         while voice.is_playing() == False and voice.is_connected() == True and queue != []:
+#             await play_audio(ctx)
 
 @client.event
-async def play_audio(ctx):
-    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+async def play_audio(guild):
+    voice = discord.utils.get(client.voice_clients, guild=guild)
+    # print(queue)
     if voice:
         if voice.is_playing():
             return
         else:
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([queue[0]])
-            for file in os.listdir("./"):
-                if file.endswith(".mp3"):
-                    os.rename(file, "./song.mp3")
-            voice.play(discord.FFmpegPCMAudio("./song.mp3"))
-            current_song = str(queue[0])
-            await ctx.channel.send(current_song)
-            queue.pop(0)
             print(queue)
+            try:
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([queue[0]])
+                for file in os.listdir("./"):
+                    if file.endswith(".mp3"):
+                        os.rename(file, "./song.mp3")
+                voice.play(discord.FFmpegPCMAudio("./song.mp3"))
+                global current_song
+                current_song = str(queue[0])
+                # await ctx.channel.send(current_song)
+                queue.pop(0)
+                print(queue)
+            except IndexError:
+                return
 
 
 
@@ -86,7 +106,7 @@ async def join(ctx):
         if not voice:
             await vc.connect()
 
-            client.loop.create_task(voice_handler(ctx))
+            client.loop.create_task(play_queue(ctx))
             
             voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
             voice.stop()
@@ -108,40 +128,37 @@ async def leave(ctx):
 @client.command()
 async def play(ctx, url:str):
     song_there = os.path.isfile("song.mp3")
-    try:
-        if song_there:
-            os.remove("song.mp3")
-    except PermissionError:
-        queue.append(url)
-        print(queue)
-        await ctx.send("Queued the song \n Wait for the current playing music to end or use the 'stop' command")
-        return
+    # try:
+    if song_there:
+        os.remove("song.mp3")
+    # except PermissionError:
+    #     queue.append(url)
+    #     print(queue)
+    #     await ctx.send("Queued the song\nWait for the current playing music to end or use the 'stop' command")
+    #     return
 
-    try:
-        if (ctx.author.voice):
-            vc = ctx.message.author.voice.channel
+    if (ctx.author.voice):
+        vc = ctx.message.author.voice.channel
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        if not voice:
+            await vc.connect()
+
+            client.loop.create_task(play_queue(ctx))
+
             voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-            if not voice:
-                await vc.connect()
-
-                client.loop.create_task(voice_handler(ctx))
-
-                voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-                voice.stop()
-                voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-                if voice:
-                    queue.append(url)
-                    print(queue)
-                    await play_audio(ctx)
-                else:
-                    await ctx.channel.send("Something went wrong")
-            else:
+            voice.stop()
+            voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+            if voice:
                 queue.append(url)
                 print(queue)
+                await play_audio(ctx.guild)
+            else:
+                await ctx.channel.send("Something went wrong")
         else:
-            await ctx.channel.send("You must be in voice channel!")
-    except discord.ext.commands.errors.MissingRequiredArgument:
-        await ctx.channel.send("Schreibe bitte mit einer URL")
+            queue.append(url)
+            print(queue)
+    else:
+        await ctx.channel.send("You must be in voice channel!")
 
 @client.command()
 async def pause(ctx):
