@@ -1,55 +1,63 @@
 {
-    "properties": {
-      "token": "",
-      "prefix": "-",
-      "status": {
-        "time": 7,
-        "messages": [
-          "Secure the Discord Server",
-          "Connect the Kahlifar Server"
-        ]
-      },
-      "general": {
-        "guild_id": 814230131681132605,
-        "events": {
-          "on_member_join": {
-            "role_id": 895288280269094983,
-            "channel": 895265478493212685,
-            "info_channel": 895265478493212686,
-            "message": "Hey, %s Willkommen auf dem Kahlifar Discord \ud83c\udf86.\nIm <#%s>-Channel bekommst du Inforamtionen \u00fcber diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber\ud83d\uddfa\ufe0f."
+  "properties": {
+    "token": "",
+    "prefix": "-",
+    "status": {
+      "time": 7,
+      "messages": [
+        "Secure the Discord Server",
+        "Connect the Kahlifar Server"
+      ]
+    },
+    "general": {
+      "guild_id": 814230131681132605,
+      "events": {
+        "on_member_join": {
+          "role_id": 895288280269094983,
+          "channel": 895265478493212685,
+          "info_channel": 895265478493212686,
+          "message": "Hey, %s Willkommen auf dem Kahlifar Discord \ud83c\udf86.\nIm <#%s>-Channel bekommst du Inforamtionen \u00fcber diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber\ud83d\uddfa\ufe0f."
+        },
+        "on_reaction_add": {
+          "verify": {
+            "channel": 895385320848236574,
+            "message_id": 895386523036418109,
+            "emoji": "\u2705",
+            "message": "By clicking/tapping the %s you agree with the rules on this Server."
           }
         }
-      },
-      "gaming": {
-        "guild_id": 895265478153478254,
-        "events": {
-          "on_member_join": {
-            "role_id": 895294208510918728,
-            "channel": 895265478493212685,
-            "info_channel": 895265478493212686,
-            "message": "Hey, %s Willkommen auf dem Kahlifar Discord \ud83c\udf86.\nIm <#%s>-Channel bekommst du Inforamtionen \u00fcber diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber\ud83d\uddfa\ufe0f."
-          },
-          "on_reaction_add": {
-            "verify": {
-              "channel": 895307686768431134,
-              "message_id": 895321980021141554,
-              "emoji": "\u2705",
-              "message": "By clicking/tapping the %s you agree with the rules on this Server."
-            }
+      }
+    },
+    "gaming": {
+      "guild_id": 895265478153478254,
+      "events": {
+        "on_member_join": {
+          "role_id": 895294208510918728,
+          "channel": 895265478493212685,
+          "info_channel": 895265478493212686,
+          "message": "Hey, %s Willkommen auf dem Kahlifar Discord \ud83c\udf86.\nIm <#%s>-Channel bekommst du Inforamtionen \u00fcber diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber\ud83d\uddfa\ufe0f."
+        },
+        "on_reaction_add": {
+          "verify": {
+            "channel": 895307686768431134,
+            "message_id": 895386526131822653,
+            "emoji": "\u2705",
+            "message": "By clicking/tapping the %s you agree with the rules on this Server."
           }
         }
-      },
-      "commands": {
-        "clear": {
-          "description": "Delete messages. `clear [amount], clear all`.",
-          "aliases": [],
-          "permissions": [
-            "Helper",
-            "Moderator",
-            "~ Discord Owner"
-          ],
-          "inline": false
-        }
+      }
+    },
+    "commands": {
+      "clear": {
+        "description": "Delete messages. `clear [amount], clear all`.",
+        "aliases": [],
+        "permissions": [
+          "Helper",
+          "Moderator",
+          "~ Discord Owner"
+        ],
+        "inline": false
       }
     }
   }
+}

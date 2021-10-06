@@ -1,3 +1,4 @@
+from os import name
 import discord
 from discord import Member
 from discord import channel
@@ -52,22 +53,26 @@ async def send_error(error, channel):
 
 
 async def sync_member(member):
-    gen_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
     gen_member = discord.utils.get(gen_guild.members, id=member.id)
-    roles = gen_member.roles
     display_name = gen_member.display_name
-
+    print(gen_member.guild)
     if await is_verified(member, gen_member):
-        await member.edit(nick=display_name)
+        for role in gen_member.roles:
+            if discord.utils.get(member.guild.roles, name=role.name) and str(role.name) != "@everyone":
+                game_role = discord.utils.get(member.guild.roles, name=role.name)
+                await member.add_roles(game_role)
+    else:
+        await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
 
 
 
 async def is_verified(game_member, gen_member):
-    game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
     for role in gen_member.roles:
-        if discord.utils.get(gen_member.guild.roles, name=role):
-            game_role = discord.utils.get(game_guild)
-            game_member.add_roles()
+        if role.id == data["properties"]["general"]["events"]["on_reaction_add"]["verify"]["role"]:
+            # print(role.id)
+            # print(data["properties"]["general"]["events"]["on_reaction_add"]["verify"]["role"])
+            return True
 
 
 # Events    ----------------------------------------------------------------------------
