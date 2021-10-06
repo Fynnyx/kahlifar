@@ -1,0 +1,47 @@
+{
+    "properties": {
+        "token": "ODk1MjY3NzEwMDcyNjU1ODcy.YV2FBw.t4aj72r132hbdRIhRdehjOT1nWw",
+        "prefix": "-",
+        "status": {
+            "time": 7,
+            "messages": [
+                "Secure the Discord Server",
+                "Connect the Kahlifar Server"
+            ]
+        },
+        "general": {
+            "guild_id": 814230131681132605,
+            "events": {
+                "on_member_join": {
+                    "role_id": 895288280269094983,
+                    "channel": 895265478493212685,
+                    "info_channel": 895265478493212686,
+                    "message": "Hey, <@%s> Willkommen auf dem Kahlifar Discord 🎆.\nIm <#%s>-Channel bekommst du Inforamtionen über diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber🗺️."
+                }
+            }
+        },
+        "gaming": {
+            "guild_id": 895265478153478254,
+            "events": {
+                "on_member_join": {
+                    "role_id": 895294208510918728,
+                    "channel": 895265478493212685,
+                    "info_channel": 895265478493212686,
+                    "message": "Hey, <@%s> Willkommen auf dem Kahlifar Discord 🎆.\nIm <#%s>-Channel bekommst du Inforamtionen über diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber🗺️."
+                }
+            }
+        },
+        "commands": {
+            "clear": {
+                "description": "Delete messages. `clear [amount], clear all`.",
+                "aliases": [],
+                "permissions": [
+                    "Helper",
+                    "Moderator",
+                    "~ Discord Owner"
+                ],
+                "inline": false
+            }      
+        }
+    }
+}
