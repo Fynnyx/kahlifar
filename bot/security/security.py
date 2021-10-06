@@ -5,7 +5,7 @@ import discord.utils
 import asyncio
 import json
 
-with open("properties.json") as f:
+with open("properties.json", encoding="UTF-8") as f:
     data = json.load(f)
 
 TOKEN = data["properties"]["token"]
@@ -20,6 +20,12 @@ intents.reactions = True
 intents.dm_messages = True
 
 client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=intents)
+
+
+# Tasks ---------------------------------------------------------------------------
+
+
+
 
 # Functions ---------------------------------------------------------------------------
 
@@ -44,14 +50,35 @@ async def send_error(error, channel):
     await msg.delete()
 
 
-# On Ready ---------------------------------------------------------------------------
+async def sync_member(member):
+    gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    print(gen_guild)
+    roles = []
+    nickname = "Test"
+
+# Events    ----------------------------------------------------------------------------
+
+@client.event
+async def on_member_join(member):
+    if int(member.guild.id) == data["properties"]["general"]["guild_id"]:
+        server = "general"
+    elif int(member.guild.id) == data["properties"]["gaming"]["guild_id"]:
+        server = "gaming"
+    welcome_channel = await client.fetch_channel(data["properties"][server]["events"]["on_member_join"]["channel"])
+    welcome_message = data["properties"][server]["events"]["on_member_join"]["message"]
+    info_channel = await client.fetch_channel(data["properties"][server]["events"]["on_member_join"]["info_channel"])
+    basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"][server]["events"]["on_member_join"]["role_id"]))
+    await member.add_roles(basic_member_role)
+    await welcome_channel.send(welcome_message % (str(member.id), str(info_channel.id)))
+
+# On Ready  ----------------------------------------------------------------------------
 
 @client.event
 async def on_ready():
     print("%sKahlifar Security: logged in" % PREFIX)
 
 
-# Commands ---------------------------------------------------------------------------
+# Commands  ----------------------------------------------------------------------------
 
 @client.command(aliases=data["properties"]["commands"]["clear"]["aliases"])
 async def clear(ctx, amount:str):
@@ -81,5 +108,12 @@ async def send_deleted_msgs(amount, channel):
     msg = await channel.send("🗑Deleted `%s` messages" % amount)
     await asyncio.sleep(2)
     await msg.delete()
+
+
+@client.command()
+async def test(ctx):
+    await sync_member(ctx.author)
+    print("Test Command Triggered")
+
 
 client.run(TOKEN)
