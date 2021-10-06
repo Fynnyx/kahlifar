@@ -1,6 +1,6 @@
 {
   "properties": {
-    "token": "",
+    "token": "ODk1MjY3NzEwMDcyNjU1ODcy.YV2FBw.1VIybD-y0IBpneLimoP41xGJGBQ",
     "prefix": "-",
     "status": {
       "time": 7,
@@ -11,6 +11,7 @@
     },
     "general": {
       "guild_id": 814230131681132605,
+      "infinite_invite": "https://discord.gg/p99m4TXN",
       "events": {
         "on_member_join": {
           "role_id": 895288280269094983,
@@ -21,10 +22,14 @@
         "on_reaction_add": {
           "verify": {
             "channel": 895385320848236574,
-            "message_id": 895386523036418109,
+            "role": 814523816818638868,
+            "message_id": 895398484864282624,
             "emoji": "\u2705",
             "message": "By clicking/tapping the %s you agree with the rules on this Server."
           }
+        },
+        "sync_member": {
+          "nv_message": "Please verify\u2705 yourself first on the General Discord.\n%s"
         }
       }
     },
@@ -40,7 +45,8 @@
         "on_reaction_add": {
           "verify": {
             "channel": 895307686768431134,
-            "message_id": 895386526131822653,
+            "role": 895265478166073353,
+            "message_id": 895398493353558046,
             "emoji": "\u2705",
             "message": "By clicking/tapping the %s you agree with the rules on this Server."
           }
