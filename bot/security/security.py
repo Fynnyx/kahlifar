@@ -26,7 +26,13 @@ client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=intents)
 
 # Tasks ---------------------------------------------------------------------------
 
-
+async def status_task():
+    messages = data["properties"]["status"]["messages"]
+    time = data["properties"]["status"]["time"]    
+    while True:
+        for x in range(len(messages)):
+            await client.change_presence(activity=discord.Game(name=messages[x]))
+            await asyncio.sleep(time)
 
 
 # Functions ---------------------------------------------------------------------------
@@ -56,15 +62,17 @@ async def sync_member(member):
     gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
     gen_member = discord.utils.get(gen_guild.members, id=member.id)
     display_name = gen_member.display_name
-    print(gen_member.guild)
     if await is_verified(member, gen_member):
+        # ADD ROLES
+        for role in member.roles:
+            if str(role.name) != "@everyone":
+                await member.remove_roles(role)
         for role in gen_member.roles:
             if discord.utils.get(member.guild.roles, name=role.name) and str(role.name) != "@everyone":
                 game_role = discord.utils.get(member.guild.roles, name=role.name)
                 await member.add_roles(game_role)
     else:
         await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
-
 
 
 async def is_verified(game_member, gen_member):
@@ -74,6 +82,12 @@ async def is_verified(game_member, gen_member):
             # print(data["properties"]["general"]["events"]["on_reaction_add"]["verify"]["role"])
             return True
 
+
+async def verify_user(user):
+    if int(user.guild.id) == data["properties"]["general"]["guild_id"]:
+        server = "general"
+    role = discord.utils.get(user.guild.roles, id=data["properties"][server]["events"]["on_reaction_add"]["verify"]["role"])
+    await user.add_roles(role)
 
 # Events    ----------------------------------------------------------------------------
 
@@ -92,8 +106,15 @@ async def on_member_join(member):
 
 @client.event
 async def on_reaction_add(reaction, user):
-    if reaction == "asd":
+    # print(reaction)
+    if reaction.message.guild.id == data["properties"]["general"]["guild_id"]:
+        server = "general"
+    elif reaction.message.guild.id == data["properties"]["gaming"]["guild_id"]:
+        server = "gaming"
+    # VERIFY
+    if reaction.emoji == data["properties"][server]["events"]["on_reaction_add"]["verify"]["emoji"] and not user.bot:
         print("verify")
+        await verify_user(user)
 
 
 # On Ready  ----------------------------------------------------------------------------
@@ -101,23 +122,24 @@ async def on_reaction_add(reaction, user):
 @client.event
 async def on_ready():
     print("%sKahlifar Security: logged in" % PREFIX)
+    client.loop.create_task(status_task())
     await send_verify()
 
 async def send_verify():
     for guild in client.guilds:
         if int(guild.id) == data["properties"]["general"]["guild_id"]:
             server = "general"
-        elif int(guild.id) == data["properties"]["gaming"]["guild_id"]:
-            server = "gaming"
-        verify_channel = discord.utils.get(guild.channels, id=data["properties"][server]["events"]["on_reaction_add"]["verify"]["channel"])
-        verify_emoji = data["properties"][server]["events"]["on_reaction_add"]["verify"]["emoji"]
-        verify_message = data["properties"][server]["events"]["on_reaction_add"]["verify"]["message"]
-        await verify_channel.purge()
-        msg = await verify_channel.send(verify_message % (verify_emoji))
-        await msg.add_reaction(verify_emoji)
-        data["properties"][server]["events"]["on_reaction_add"]["verify"]["message_id"] = int(msg.id)
-        with open("properties.json", "w", encoding="UTF-8") as f:
-            f.write(json.dumps(data, indent=2))
+        # elif int(guild.id) == data["properties"]["gaming"]["guild_id"]:
+        #     server = "gaming"
+            verify_channel = discord.utils.get(guild.channels, id=data["properties"][server]["events"]["on_reaction_add"]["verify"]["channel"])
+            verify_emoji = data["properties"][server]["events"]["on_reaction_add"]["verify"]["emoji"]
+            verify_message = data["properties"][server]["events"]["on_reaction_add"]["verify"]["message"]
+            await verify_channel.purge()
+            msg = await verify_channel.send(verify_message % (verify_emoji))
+            await msg.add_reaction(verify_emoji)
+            data["properties"][server]["events"]["on_reaction_add"]["verify"]["message_id"] = int(msg.id)
+            with open("properties.json", "w", encoding="UTF-8") as f:
+                f.write(json.dumps(data, indent=2))
 
 
 
@@ -152,7 +174,6 @@ async def send_deleted_msgs(amount, channel):
 @client.command()
 async def test(ctx):
     await sync_member(ctx.author)
-    print("Test Command Triggered")
 
 
 client.run(TOKEN)
