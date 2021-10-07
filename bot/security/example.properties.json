@@ -23,7 +23,7 @@
           "verify": {
             "channel": 895385320848236574,
             "role": 814523816818638868,
-            "message_id": 895398484864282624,
+            "message_id": 895721973764735027,
             "emoji": "\u2705",
             "message": "By clicking/tapping the %s you agree with the rules on this Server."
           }
@@ -46,10 +46,17 @@
           "verify": {
             "channel": 895307686768431134,
             "role": 895265478166073353,
-            "message_id": 895398493353558046,
+            "message_id": 895527798091939871,
             "emoji": "\u2705",
             "message": "By clicking/tapping the %s you agree with the rules on this Server."
-          }
+          },
+          "self_roles": [
+            {
+              "\ud83d\udd34": {
+                "role": 895548444373057599
+              }
+            }
+          ]
         }
       }
     },
