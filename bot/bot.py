@@ -1,11 +1,7 @@
 from datetime import time
 import discord
-from discord import FFmpegPCMAudio
-from discord import embeds
-from discord import colour
 from discord.ext import commands
 import discord.utils
-from discord_components import *
 from discord.member import Member
 import asyncio
 import json
@@ -63,9 +59,7 @@ async def get_embed(file:str):
                             colour=discord.Colour(edata["embed"]["color"]))
 
     for field in edata["embed"]["fields"]:
-        print(field)
-    
-    
+        embed.add_field(name=field["name"], value=field["value"], inline=False)
     return embed
 
 
@@ -96,10 +90,9 @@ async def send_error(error, channel):
 async def on_ready():
     print("Kahlifar: logged in")
     client.loop.create_task(status_task())
-    # await client.change_presence(discord.CustomActivity(name="Test", type=discord.ActivityType.streaming))
 
 
-# Moderator ---------------------------------------------------------------------------
+# Events ---------------------------------------------------------------------------
 
 @client.event
 async def on_member_join(member):
@@ -109,6 +102,13 @@ async def on_member_join(member):
     basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"]["events"]["on_member_join"]["role_id"]))
     await member.add_roles(basic_member_role)
     await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
+
+    # # SELF ROLES
+    # for self_role in data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"]:
+    #     if reaction.emoji == str(self_role):
+    #         gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    #         role = discord.utils.get(gen_guild.roles, id=data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"][str(self_role)]["role"])
+    #         await user.add_roles(role)
 
 
 # Help Command ---------------------------------------------------------------------------
@@ -131,13 +131,15 @@ async def send_help_embed(ctx):
     await ctx.channel.send(embed=help_embed)
 
 
-# Rules ---------------------------------------------------------------------------
+# Embeds ---------------------------------------------------------------------------
 
 @client.command()
 async def rules(ctx):
-    rule_embed = await get_embed("rules.json")
-    rule_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rule"]["channel"])
-    await rule_channel.send(embed=rule_embed)
+    if await check_permissions("rules", ctx.author, ctx.channel):
+        rule_embed = await get_embed("rules.json")
+        rule_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rule"]["channel"])
+        await rule_channel.send(embed=rule_embed)
+    await ctx.message.delete()
 
 
 # Social Media ---------------------------------------------------------------------------

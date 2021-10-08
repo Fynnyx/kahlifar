@@ -1,8 +1,8 @@
 {
   "embed": {
-    "title": "-- Regeln für das Kahlifar Netzwerk --",
+    "title": "-+- 📜 Regeln für das Kahlifar Netzwerk 📜 -+-",
     "description": "Im folgenden Text werden die Regeln des Kahlifar Netzwerks aufgelistet.\n**Wenn du mit dem Discord Server interagierst (schreiben, reden, lesen, usw.), stimmst Du den Regeln zu!**",
-    "color": 13944215,
+    "color": 16242628,
     "fields": [
       {
         "name": "- §01 -",
@@ -20,7 +20,7 @@
       },
       {
         "name": "- §04 -",
-        "value": "Nicht unnötig spamen",
+        "value": "Nicht unnötig spamen!",
         "inline": false
       },
       {
@@ -40,7 +40,7 @@
       },
       {
         "name": "- §08 -",
-        "value": "Keinen Handel treiben über diesen Server (Z.B. Minecraft Accounts, etc.)",
+        "value": "Keinen Handel treiben über diesen Server. (Z.B. Minecraft Accounts, etc.)",
         "inline" : false
       },
       {
@@ -65,7 +65,7 @@
       },
       {
         "name": "\u200b",
-        "value": "**- Minecraft Rgeln -**\nTrotzdem gelten alle anderen Regen auch nicht",
+        "value": "**- Minecraft Rgeln -**\nTrotzdem gelten alle anderen Regen auch noch.",
         "inline" : false
       },
       {
@@ -80,7 +80,12 @@
       },
       {
         "name": "- §03 -",
-        "value": "Bugabusing welche dir einen Spielvorteil verschaffen sind nicht erlaubt",
+        "value": "Bugabusing welche dir einen Spielvorteil verschaffen sind nicht erlaubt.",
+        "inline" : false
+      },
+      {
+        "name": "\u200b",
+        "value": "---------------------------",
         "inline" : false
       },
       {

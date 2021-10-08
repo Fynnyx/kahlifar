@@ -1,0 +1,13 @@
+{
+    "embed": {
+        "title": "TITLE",
+        "description": "DESCRIPTION",
+        "color": 1111111,
+        "fields": [
+            {
+                "name": "NAME",
+                "value": "VALUE"
+            }
+        ]
+    }
+}

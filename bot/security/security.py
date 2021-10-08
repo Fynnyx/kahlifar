@@ -13,7 +13,7 @@ TOKEN = data["properties"]["token"]
 PREFIX = data["properties"]["prefix"]
 
 intents = discord.Intents()
-intents.bans = False
+intents.bans = True
 intents.dm_messages = True
 intents.dm_reactions= False
 intents.dm_typing= False
@@ -106,9 +106,7 @@ async def sync_nick(member_id, nick):
         return
 
 async def sync_roles(member, gen_member):
-    for role in member.roles:
-        if str(role.name) != "@everyone":
-            await member.remove_roles(role)
+    await member.remove_roles()
     for role in gen_member.roles:
         if discord.utils.get(member.guild.roles, name=role.name) and str(role.name) != "@everyone":
             game_role = discord.utils.get(member.guild.roles, name=role.name)
@@ -120,42 +118,41 @@ async def sync_user_roles(member_id, guild):
         game_guild = discord.utils.get(client.guilds, id=(data["properties"]["gaming"]["guild_id"]))
         game_user = discord.utils.get(game_guild.members, id=member_id)
         gen_user = discord.utils.get(gen_guild.members, id=member_id)
-        for role in game_user.roles:
-            if str(role.name) != "@everyone":
-                await game_user.remove_roles(role)
-        for role in gen_user.roles:
-            if discord.utils.get(game_guild.roles, name=role.name) and str(role.name) != "@everyone":
-                game_role = discord.utils.get(game_guild.roles, name=role.name)
-                await game_user.add_roles(game_role)
+        if game_user != None:
+            await game_user.remove_roles()
+            for role in gen_user.roles:
+                if discord.utils.get(game_guild.roles, name=role.name) and str(role.name) != "@everyone":
+                    game_role = discord.utils.get(game_guild.roles, name=role.name)
+                    await game_user.add_roles(game_role)
 
 
 # Listerners    ----------------------------------------------------------------------------
 
-# @client.event
-# async def on_member_join(member):
-#     if int(member.guild.id) == data["properties"]["general"]["guild_id"]:
-#         server = "general"
-#     elif int(member.guild.id) == data["properties"]["gaming"]["guild_id"]:
-#         server = "gaming"
-#     await sync_member(member)
+@client.event
+async def on_member_join(member):
+    game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    game_member = discord.utils.get(game_guild.members, id=member.id)
+    print(game_member)
+    if game_member != None:
+        await sync_member(member)
 
-# @client.event
-# async def on_reaction_add(reaction, user):
-#     # if user
-#     print(reaction)
-#     if reaction.message.guild.id == data["properties"]["general"]["guild_id"]:
-#         server = "general"
-#     elif reaction.message.guild.id == data["properties"]["gaming"]["guild_id"]:
-#         server = "gaming"
-#     # VERIFY
-#     if reaction.emoji == data["properties"][server]["events"]["on_reaction_add"]["verify"]["emoji"] and not user.bot:
-#         await verify_user(user)
-#     # SELF ROLES
-#     for self_role in data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"]:
-#         if reaction.emoji == str(self_role):
-#             gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
-#             role = discord.utils.get(gen_guild.roles, id=data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"][str(self_role)]["role"])
-#             await user.add_roles(role)
+@client.event
+async def on_member_remove(member):
+    if member.guild.id == data["properties"]["general"]["guild_id"]:
+        game_guild =  discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+        game_member = discord.utils.get(game_guild.members, id=member.id)
+        if game_member != None:
+            await game_member.kick()
+
+@client.event
+async def on_reaction_add(reaction, user):
+    if reaction.message.guild.id == data["properties"]["general"]["guild_id"]:
+        server = "general"
+    elif reaction.message.guild.id == data["properties"]["gaming"]["guild_id"]:
+        server = "gaming"
+    # VERIFY
+    if reaction.emoji == data["properties"][server]["events"]["on_reaction_add"]["verify"]["emoji"] and not user.bot:
+        await verify_user(user)
 
 @client.event
 async def on_member_update(before, after):
