@@ -1,23 +1,93 @@
 {
-    "embed": {
-      "title": "Regeln auf dem Discord und Mincraft Server",
-      "description": "`Was passiert bei Regelbruch`",
-      "color": "0x9013fe",
-      "fields": [
-        {
-          "name": "Regel 1",
-          "value": "Kahlifar ist uhrsprünglich ein Minecraft Projekt. Heute ist es mehr eine Community die zusammen jegliche Spiele, von verschiedesten Mincraft Minispielen über Valorant bis zum Landwirtschafts Simmulator. Wir sind offen für neues."
-        },
-        {
-          "name": "Regel 2",
-          "value": "try exceeding some of them!",
-          "inline" : false
-        },
-        {
-          "name": "🙄",
-          "value": "an informative error should show up, and this view will remain as-is until all issues are fixed",
-          "inline": false
-        }
-      ]
-    }
+  "embed": {
+    "title": "-- Regeln für das Kahlifar Netzwerk --",
+    "description": "Im folgenden Text werden die Regeln des Kahlifar Netzwerks aufgelistet.\n**Wenn du mit dem Discord Server interagierst (schreiben, reden, lesen, usw.), stimmst Du den Regeln zu!**",
+    "color": "0xFFE8BD",
+    "fields": [
+      {
+        "name": "- §01 -",
+        "value": "Die [Discord Nutzungsbedingungen](https://discord.com/terms) müssen, wie die [Discord Community-Richtlinien](https://discord.com/guidelines) befolgt werden."
+      },
+      {
+        "name": "- §02 -",
+        "value": "Keine Beleidigungen!",
+        "inline": false
+      },
+      {
+        "name": "- §03 -",
+        "value": "Kein Rassismus!",
+        "inline": false
+      },
+      {
+        "name": "- §04 -",
+        "value": "Nicht unnötig spamen",
+        "inline": false
+      },
+      {
+        "name": "- §05 -",
+        "value": "Bannungsumgehungen durch 2. Accounts werden nicht geduldet.",
+        "inline": false
+      },
+      {
+        "name": "- §06 -",
+        "value": "Anweisungen der Mods sind zu befolgen.",
+        "inline": false
+      },
+      {
+        "name": "- §07 -",
+        "value": "Keine Werbung machen, ausser wenn dies mit den Ownern abgesprochen wurde.",
+        "inline" : false
+      },
+      {
+        "name": "- §08 -",
+        "value": "Keinen Handel treiben über diesen Server (Z.B. Minecraft Accounts, etc.)",
+        "inline" : false
+      },
+      {
+        "name": "- §09 -",
+        "value": "Jeder hat die Möglichkeit sich einen Nickbame zu geben, dieser darf jedoch nicht der Name eines anderen Mitgliedes sein oder beleidigend sein für jemand anderen.",
+        "inline" : false
+      },
+      {
+        "name": "- §10 -",
+        "value": "Die Regeln können jederzeit geändert werden. (Wird in News kommuniziert)",
+        "inline" : false
+      },
+      {
+        "name": "- §11 -",
+        "value": "Du bist für das verantwortlich was auf deinem Account passiert, also we. z.B. deine Katze mit deinem Handy jemandem beleidigt bist du dafür verantwortlich.",
+        "inline" : false
+      },
+      {
+        "name": "- §12 -",
+        "value": "Unwissenheit schützt vor Strafe nicht! Wer diesem Server joined hat automatisch die Regeln zu befolgen.",
+        "inline" : false
+      },
+      {
+        "name": "\u200b",
+        "value": "**- Minecraft Rgeln -**\nTrotzdem gelten alle anderen Regen auch nicht",
+        "inline" : false
+      },
+      {
+        "name": "- §01 -",
+        "value": "Spielerköpfe müssen bei Aufforderung zurückgegeben werden.",
+        "inline" : false
+      },
+      {
+        "name": "- §02 -",
+        "value": "Programme die dir einen Spielvorteil verschaffen (XRAY, etc) werden nicht geduldet.",
+        "inline" : false
+      },
+      {
+        "name": "- §03 -",
+        "value": "Bugabusing welche dir einen Spielvorteil verschaffen sind nicht erlaubt",
+        "inline" : false
+      },
+      {
+        "name": "⛔ - Bei Verstoss - ⛔",
+        "value": "Bei Verstössen kann es zu einem Verwarnung, Timeout oder Bann kommen.\n Der Server Owner und die Moderatoren haben das Recht diese Regeln durchzusetzen.",
+        "inline" : false
+      }
+    ]
   }
+}
