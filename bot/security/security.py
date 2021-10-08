@@ -131,37 +131,31 @@ async def sync_user_roles(member_id, guild):
 
 # Listerners    ----------------------------------------------------------------------------
 
-@client.event
-async def on_member_join(member):
-    if int(member.guild.id) == data["properties"]["general"]["guild_id"]:
-        server = "general"
-    elif int(member.guild.id) == data["properties"]["gaming"]["guild_id"]:
-        server = "gaming"
-    welcome_channel = await client.fetch_channel(data["properties"][server]["events"]["on_member_join"]["channel"])
-    welcome_message = data["properties"][server]["events"]["on_member_join"]["message"]
-    info_channel = await client.fetch_channel(data["properties"][server]["events"]["on_member_join"]["info_channel"])
-    basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"][server]["events"]["on_member_join"]["role_id"]))
-    await member.add_roles(basic_member_role)
-    await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
-    await sync_member(member)
+# @client.event
+# async def on_member_join(member):
+#     if int(member.guild.id) == data["properties"]["general"]["guild_id"]:
+#         server = "general"
+#     elif int(member.guild.id) == data["properties"]["gaming"]["guild_id"]:
+#         server = "gaming"
+#     await sync_member(member)
 
-@client.event
-async def on_reaction_add(reaction, user):
-    # if user
-    print(reaction)
-    if reaction.message.guild.id == data["properties"]["general"]["guild_id"]:
-        server = "general"
-    elif reaction.message.guild.id == data["properties"]["gaming"]["guild_id"]:
-        server = "gaming"
-    # VERIFY
-    if reaction.emoji == data["properties"][server]["events"]["on_reaction_add"]["verify"]["emoji"] and not user.bot:
-        await verify_user(user)
-    # SELF ROLES
-    for self_role in data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"]:
-        if reaction.emoji == str(self_role):
-            gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
-            role = discord.utils.get(gen_guild.roles, id=data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"][str(self_role)]["role"])
-            await user.add_roles(role)
+# @client.event
+# async def on_reaction_add(reaction, user):
+#     # if user
+#     print(reaction)
+#     if reaction.message.guild.id == data["properties"]["general"]["guild_id"]:
+#         server = "general"
+#     elif reaction.message.guild.id == data["properties"]["gaming"]["guild_id"]:
+#         server = "gaming"
+#     # VERIFY
+#     if reaction.emoji == data["properties"][server]["events"]["on_reaction_add"]["verify"]["emoji"] and not user.bot:
+#         await verify_user(user)
+#     # SELF ROLES
+#     for self_role in data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"]:
+#         if reaction.emoji == str(self_role):
+#             gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+#             role = discord.utils.get(gen_guild.roles, id=data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"][str(self_role)]["role"])
+#             await user.add_roles(role)
 
 @client.event
 async def on_member_update(before, after):
@@ -221,11 +215,6 @@ async def send_deleted_msgs(amount, channel):
     msg = await channel.send("🗑Deleted `%s` messages" % amount)
     await asyncio.sleep(2)
     await msg.delete()
-
-
-async def rules(ctx):
-    await ctx.send("Rules comming soon")
-
 
 @client.command()
 async def sync(ctx):

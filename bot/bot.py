@@ -1,25 +1,14 @@
-from os import name
-import re
+from datetime import time
 import discord
 from discord import FFmpegPCMAudio
-
-from discord.ext.commands.core import check
+from discord import embeds
+from discord import colour
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions, CheckFailure
-
-
 import discord.utils
-
-from discord_buttons_plugin import ButtonsClient, ActionRow
 from discord_components import *
 from discord.member import Member
-
-from discord_slash import SlashCommand, SlashContext
-from discord_slash.utils.manage_commands import create_choice, create_option
-
 import asyncio
 import json
-
 
 
 with open("properties.json") as f:
@@ -31,10 +20,28 @@ PREFIX = data["properties"]["prefix"]
 discord_link = data["properties"]["discord_link"]
 server_ip = data["properties"]["server_ip"]
 
+intents = discord.Intents()
+intents.bans = False
+intents.dm_messages = True
+intents.dm_reactions= False
+intents.dm_typing= False
+intents.emojis = True
+intents.guild_messages = False
+intents.guild_reactions = False
+intents.guild_typing = False
+intents.guilds = True
+intents.integrations = False
+intents.invites = True
+intents.members = True
+intents.messages = True
+intents.presences= False
+intents.reactions = True
+intents.typing= False
+intents.voice_states= False
+intents.webhooks= False
 
-client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=discord.Intents.all())
-slash = SlashCommand(client, sync_commands=True)
-button = ButtonsClient(client)
+
+client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=intents)
 
 
 # Functions ---------------------------------------------------------------------------
@@ -46,6 +53,20 @@ async def status_task():
         for x in range(len(messages)):
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
+
+async def get_embed(file:str):
+    with open("./assets/embeds/%s" % file, encoding="UTF-8") as e:
+        edata = json.load(e)
+
+    embed = discord.Embed(title=edata["embed"]["title"],
+                            description=edata["embed"]["description"],
+                            colour=discord.Colour(edata["embed"]["color"]))
+
+    for field in edata["embed"]["fields"]:
+        print(field)
+    
+    
+    return embed
 
 
 async def check_permissions(command, user:Member, channel):
@@ -80,65 +101,20 @@ async def on_ready():
 
 # Moderator ---------------------------------------------------------------------------
 
-@slash.slash(
-    name="clear",
-    description="Clear Messages", 
-    guild_ids=[804436188433088574],
-    options=[
-        create_option(
-            name="amount",
-            description="How many Messages",
-            option_type=3,
-            required=False
-        )
-    ]
-)    
-@client.command(aliases=data["properties"]["commands"]["clear"]["aliases"])
-async def clear(ctx:SlashContext, amount:str):
-    channel = ctx.message.channel
-    if await check_permissions("clear", ctx.message.author, channel):
-        if amount == 'all':
-            await channel.purge()
-            await send_deleted_msgs("all", channel)
-        elif amount:
-            try:
-                amount = int(amount)
-                await channel.purge(limit=amount)
-                await send_deleted_msgs(amount, channel)
-            except TypeError:
-                await send_error("Amount must be a number!", channel)
-            except:
-                await send_error("Please try this format -> `-clear [amount(number)]`", channel)
-    elif isinstance(amount, commands.MissingRequiredArgument):
-        amount = 2
-        await channel.purge(limit=amount)
-        await send_deleted_msgs(amount, channel) 
-    else:
-        await send_error("Please try this format -> `-clear [amount(number)]`", channel)
-        return
-
-
-async def send_deleted_msgs(amount, channel):
-    msg = await channel.send("🗑Deleted `%s` messages" % amount)
-    await asyncio.sleep(2)
-    await msg.delete()
-
-
-
-# @client.event
-# async def on_member_join(member):
-#     print("New Member")
-#     await client.send_message(member,"Welcome!")
+@client.event
+async def on_member_join(member):
+    welcome_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["channel"])
+    welcome_message = data["properties"]["events"]["on_member_join"]["message"]
+    info_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["info_channel"])
+    basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"]["events"]["on_member_join"]["role_id"]))
+    await member.add_roles(basic_member_role)
+    await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
 
 
 # Help Command ---------------------------------------------------------------------------
 
-@slash.slash(
-    name="help", 
-    description="Gives you all commands.", 
-    guild_ids=[804436188433088574])
 @client.command(pass_context=True, aliases=list(data["properties"]["commands"]["help"]["aliases"]))
-async def help(ctx:SlashContext):
+async def help(ctx):
     await send_help_embed(ctx)
 
 async def send_help_embed(ctx):
@@ -155,99 +131,14 @@ async def send_help_embed(ctx):
     await ctx.channel.send(embed=help_embed)
 
 
-# Voice Channel ---------------------------------------------------------------------------
+# Rules ---------------------------------------------------------------------------
 
-@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["join"]["aliases"]))
-async def join(ctx):
-    if (ctx.author.voice):
-        channel = ctx.message.author.voice.channel
-        global voice
-        voice = await channel.connect()
-        # source = FFmpegPCMAudio("./assets/sounds/airhorn_sound.mp3")
-        # player = voice.play(source)
-    else:
-        await send_error("You have to connect to a Voice-Channel", ctx.message.channel)
-        await asyncio.sleep(3)
-        await ctx.message.delete()
+@client.command()
+async def rules(ctx):
+    rule_embed = await get_embed("rules.json")
+    rule_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rule"]["channel"])
+    await rule_channel.send(embed=rule_embed)
 
-@client.command(pass_context=True)
-async def leave(ctx):
-    if ctx.voice_client:
-        await ctx.guild.voice_client.disconnect()
-        await ctx.channel.send("💨 Successfully disconnected!")
-    else:
-        await send_error("Ich bin in keinem Voice Channel", ctx.message.channel)
-        await asyncio.sleep(3)
-        await ctx.message.delete()
-
-@client.command(pass_context=True)
-async def buzzer(ctx):
-    if ctx.voice_client:
-        source = FFmpegPCMAudio("./assets/sounds/airhorn_sound.mp3")
-        player = voice.play(source)
-@client.command(pass_context=True)
-async def cbuzzer(ctx):
-    if voice:
-        source = FFmpegPCMAudio("./assets/sounds/mlg-airhorn.mp3")
-        player = voice.play(source)
-
-@client.command(aliases=list(data["properties"]["commands"]["sound_board"]["aliases"]))
-async def sound_board(ctx):
-    sb_embed = discord.Embed(title="🔊-Kahlifar-Soundboard-🔊", 
-                                colour=discord.Colour(0x9013fe), 
-                                description="Hier kannst du mit dem Bot verschiedenste Sounds in einem VC spielen.\n Hab spass")
-
-    sb_embed.set_footer(text="❗-Abuse führt zu einem Bann")
-    
-    sb_embed.add_field(name="1️⃣", value="Normal Airhorn sound", inline=True)
-    sb_embed.add_field(name="2️⃣", value="MLG Airhorn", inline=True)
-    sb_embed.add_field(name="3️⃣", value="Discord Join Sound", inline=True)
-    sb_embed.add_field(name="4️⃣", value="Discord Left Sound", inline=True)
-    sb_embed.add_field(name="5️⃣", value="-", inline=True)
-    sb_embed.add_field(name="6️⃣", value="-", inline=True)
-
-    await ctx.send(embed=sb_embed, 
-                    components=[
-                            Button(
-                                emoji="1️⃣", 
-                                custom_id="button1",
-                                style=ButtonStyle(value=1)),
-                            Button(
-                                emoji="2️⃣",
-                                custom_id="button2",
-                                style=ButtonStyle(value=1)),
-                            Button(
-                                emoji="3️⃣",
-                                custom_id="button3",
-                                style=ButtonStyle(value=1)),
-                            Button(
-                                emoji="4️⃣",
-                                custom_id="button4",
-                                style=ButtonStyle(value=1))
-                            ])
-    interaction = await client.wait_for("button_click", check=lambda i: i.component.label.startswith("1️⃣"))
-    await interaction(await play_sound("./assets/sounds/airhorn_sound.mp3"))
-                        
-# @button.click
-# async def button1(ctx):
-#     await play_sound("./assets/sounds/airhorn_sound.mp3")
-
-@button.click
-async def button2(ctx):
-    await play_sound("./assets/sounds/mlg-airhorn.mp3")
-
-@button.click
-async def button3(ctx):
-    await play_sound("./assets/sounds/discord_join.mp3")
-@button.click
-async def button4(ctx):
-    await play_sound("./assets/sounds/discord_leave.mp3")
-
-async def play_sound(pfad:str):
-    source = FFmpegPCMAudio(pfad)
-    player = voice.play(source)
-
-        
 
 # Social Media ---------------------------------------------------------------------------
 
@@ -265,18 +156,7 @@ async def social_media(ctx):
                                     description="Hier werden dir alle Informationen über die verschiedenen Commands die der <@%s> kann, welche Aliasse er hat und wer die Rechte hat den Command zu benutzen." % str(client.user.id),
                                     colour=discord.Colour(0x9013fe))
 
-    for command in data["properties"]["commands"]:
-        
-        sm_embed.add_field(name="-- %s --" %(command),
-                                value="*Beschreibung:* %s \n *Aliasse:* %s \n *Rechte:* %s hat/haben Zugriff auf diesen Command." % (data["properties"]["commands"][command]["description"], data["properties"]["commands"][command]["aliases"], data["properties"]["commands"][command]["permissions"]),
-                                inline=bool(data["properties"]["commands"][command]["inline"]))
-
     await ctx.channel.send(embed=sm_embed)
-
-
-
-
-
 
 
 client.run(TOKEN)

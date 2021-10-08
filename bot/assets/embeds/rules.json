@@ -2,7 +2,7 @@
   "embed": {
     "title": "-- Regeln für das Kahlifar Netzwerk --",
     "description": "Im folgenden Text werden die Regeln des Kahlifar Netzwerks aufgelistet.\n**Wenn du mit dem Discord Server interagierst (schreiben, reden, lesen, usw.), stimmst Du den Regeln zu!**",
-    "color": "0xFFE8BD",
+    "color": 13944215,
     "fields": [
       {
         "name": "- §01 -",
