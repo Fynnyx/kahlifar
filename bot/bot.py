@@ -125,18 +125,18 @@ async def send_deleted_msgs(amount, channel):
 
 
 
-# @client.event
-# async def on_member_join(member):
-#     print("New Member")
-#     await client.send_message(member,"Welcome!")
+@client.event
+async def on_member_join(member):
+    welcome_channel = await client.fetch_channel(data["properties"]["general"]["events"]["on_member_join"]["channel"])
+    welcome_message = data["properties"]["general"]["events"]["on_member_join"]["message"]
+    info_channel = await client.fetch_channel(data["properties"]["general"]["events"]["on_member_join"]["info_channel"])
+    basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"]["general"]["events"]["on_member_join"]["role_id"]))
+    await member.add_roles(basic_member_role)
+    await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
 
 
 # Help Command ---------------------------------------------------------------------------
 
-@slash.slash(
-    name="help", 
-    description="Gives you all commands.", 
-    guild_ids=[804436188433088574])
 @client.command(pass_context=True, aliases=list(data["properties"]["commands"]["help"]["aliases"]))
 async def help(ctx:SlashContext):
     await send_help_embed(ctx)
@@ -153,6 +153,31 @@ async def send_help_embed(ctx):
                                 inline=bool(data["properties"]["commands"][command]["inline"]))
 
     await ctx.channel.send(embed=help_embed)
+
+
+# Social Media ---------------------------------------------------------------------------
+
+@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["discord_link"]["aliases"]))
+async def discord_link(ctx):
+    await ctx.channel.send(data["properties"]["discord_link"])
+
+@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["server_ip"]["aliases"]))
+async def server_ip(ctx):
+    await ctx.channel.send(data["properties"]["server_ip"])
+
+@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["social_media"]["aliases"]))
+async def social_media(ctx):
+    sm_embed = discord.Embed(title="Social Media Links für Kahlifar",
+                                    description="Hier werden dir alle Informationen über die verschiedenen Commands die der <@%s> kann, welche Aliasse er hat und wer die Rechte hat den Command zu benutzen." % str(client.user.id),
+                                    colour=discord.Colour(0x9013fe))
+
+    for command in data["properties"]["commands"]:
+        
+        sm_embed.add_field(name="-- %s --" %(command),
+                                value="*Beschreibung:* %s \n *Aliasse:* %s \n *Rechte:* %s hat/haben Zugriff auf diesen Command." % (data["properties"]["commands"][command]["description"], data["properties"]["commands"][command]["aliases"], data["properties"]["commands"][command]["permissions"]),
+                                inline=bool(data["properties"]["commands"][command]["inline"]))
+
+    await ctx.channel.send(embed=sm_embed)
 
 
 # Voice Channel ---------------------------------------------------------------------------
@@ -246,34 +271,7 @@ async def button4(ctx):
 async def play_sound(pfad:str):
     source = FFmpegPCMAudio(pfad)
     player = voice.play(source)
-
         
-
-# Social Media ---------------------------------------------------------------------------
-
-@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["discord_link"]["aliases"]))
-async def discord_link(ctx):
-    await ctx.channel.send(data["properties"]["discord_link"])
-
-@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["server_ip"]["aliases"]))
-async def server_ip(ctx):
-    await ctx.channel.send(data["properties"]["server_ip"])
-
-@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["social_media"]["aliases"]))
-async def social_media(ctx):
-    sm_embed = discord.Embed(title="Social Media Links für Kahlifar",
-                                    description="Hier werden dir alle Informationen über die verschiedenen Commands die der <@%s> kann, welche Aliasse er hat und wer die Rechte hat den Command zu benutzen." % str(client.user.id),
-                                    colour=discord.Colour(0x9013fe))
-
-    for command in data["properties"]["commands"]:
-        
-        sm_embed.add_field(name="-- %s --" %(command),
-                                value="*Beschreibung:* %s \n *Aliasse:* %s \n *Rechte:* %s hat/haben Zugriff auf diesen Command." % (data["properties"]["commands"][command]["description"], data["properties"]["commands"][command]["aliases"], data["properties"]["commands"][command]["permissions"]),
-                                inline=bool(data["properties"]["commands"][command]["inline"]))
-
-    await ctx.channel.send(embed=sm_embed)
-
-
 
 
 

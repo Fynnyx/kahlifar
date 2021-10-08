@@ -137,12 +137,6 @@ async def on_member_join(member):
         server = "general"
     elif int(member.guild.id) == data["properties"]["gaming"]["guild_id"]:
         server = "gaming"
-    welcome_channel = await client.fetch_channel(data["properties"][server]["events"]["on_member_join"]["channel"])
-    welcome_message = data["properties"][server]["events"]["on_member_join"]["message"]
-    info_channel = await client.fetch_channel(data["properties"][server]["events"]["on_member_join"]["info_channel"])
-    basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"][server]["events"]["on_member_join"]["role_id"]))
-    await member.add_roles(basic_member_role)
-    await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
     await sync_member(member)
 
 @client.event
