@@ -1,6 +1,6 @@
 {
     "properties": {
-        "token": "",
+        "token": "ODg2NTg1NDYyNjk1NzkyNjUw.YT3vDg.owfMFyhcFqBWOP8ghv0BG5JsCvk",
         "prefix": "-",
         "discord_link": "https://discord.gg/jyuPtTEGuV",
         "server_ip": "test.play-mc.de",
@@ -22,6 +22,9 @@
         },
         "rule": {
             "channel": 835631187094667315
+        },
+        "krules":{
+            "channel": 896877068187484181
         },
         "commands": {
             "help": {
@@ -80,6 +83,14 @@
             },
             "rules": {
                 "description": "Send the rules embed",
+                "aliases": [],
+                "permissions": [
+                    "Owner"
+                ],
+                "inline": false
+            },
+            "krules": {
+                "description": "Send the kahlifar rules embed",
                 "aliases": [],
                 "permissions": [
                     "Owner"
