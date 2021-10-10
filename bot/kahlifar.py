@@ -138,7 +138,17 @@ async def rules(ctx):
     if await check_permissions("rules", ctx.author, ctx.channel):
         rule_embed = await get_embed("rules.json")
         rule_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rule"]["channel"])
+        await rule_channel.purge()
         await rule_channel.send(embed=rule_embed)
+    await ctx.message.delete()
+
+@client.command()
+async def krules(ctx):
+    if await check_permissions("krules", ctx.author, ctx.channel):
+        krules_embed = await get_embed("k-rules.json")
+        krules_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["krules"]["channel"])
+        await krules_channel.purge()
+        await krules_channel.send(embed=krules_embed)
     await ctx.message.delete()
 
 
