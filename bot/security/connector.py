@@ -5,6 +5,8 @@ import discord.utils
 import asyncio
 import json
 
+from log import log_to_console
+
 with open("properties.json", encoding="UTF-8") as f:
     data = json.load(f)
 
@@ -161,6 +163,18 @@ async def on_member_update(before, after):
         await sync_user_roles(after.id, after.guild)
     if before.nick != after.nick:
         await sync_nick(after.id, after.nick)
+
+# Error handling ------------------------------------------------------------
+
+@client.listen("on_error")
+async def log_error(error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
+
+@client.listen("on_command_error")
+async def log_command_error(ctx, error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
 
 # On Ready  ----------------------------------------------------------------------------
 

@@ -114,7 +114,13 @@ async def on_member_join(member):
 
 @client.listen("on_error")
 async def log_error(error):
-    await log_to_console(error, )
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
+
+@client.listen("on_command_error")
+async def log_command_error(ctx, error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
 
 
 # Help Command ---------------------------------------------------------------------------
@@ -175,6 +181,7 @@ async def social_media(ctx):
                                     colour=discord.Colour(0x9013fe))
 
     await ctx.channel.send(embed=sm_embed)
+
 
 @client.command()
 async def log(ctx):
