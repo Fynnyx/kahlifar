@@ -1,4 +1,5 @@
 import discord
+from discord import channel
 from discord.ext import commands
 import discord.utils
 from discord.member import Member
@@ -114,15 +115,15 @@ async def on_member_join(member):
 
 # Error handling ------------------------------------------------------------
 
-@client.listen("on_error")
-async def log_error(error):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+# @client.listen("on_error")
+# async def log_error(error):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console(error, guild)
 
-@client.listen("on_command_error")
-async def log_command_error(ctx, error):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+# @client.listen("on_command_error")
+# async def log_command_error(ctx, error):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console(error, guild)
 
 
 # Help Command ---------------------------------------------------------------------------
@@ -165,6 +166,22 @@ async def krules(ctx):
         await krules_channel.send(embed=krules_embed)
     await ctx.message.delete()
 
+@client.command()
+async def infos(ctx):
+    if await check_permissions("infos", ctx.author, ctx.channel):
+        with open("./assets/infos.json", encoding="UTF-8") as j:
+            info = json.load(j)
+        image_path = "./assets/images/"
+        channel = ctx.channel
+
+
+        await channel.send(file=discord.File(image_path+info["infos"]["file1"]))
+        await channel.send(info["infos"]["text1"] % (data["properties"]["infos"]["wolfi"], data["properties"]["infos"]["fynnyx"]))
+        await channel.send(file=discord.File(image_path+info["infos"]["file2"]))
+        await channel.send(info["infos"]["text2"])
+    else:
+        await ctx.message.delete()
+
 
 # Social Media ---------------------------------------------------------------------------
 
@@ -183,12 +200,6 @@ async def social_media(ctx):
                                     colour=discord.Colour(0x9013fe))
 
     await ctx.channel.send(embed=sm_embed)
-
-
-@client.command()
-async def log(ctx):
-    await log_to_console("test", ctx.guild)
-
 
 
 client.run(TOKEN)
