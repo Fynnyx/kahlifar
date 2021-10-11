@@ -1,9 +1,6 @@
-from os import error
 from datetime import datetime
 import discord
-from discord import colour
 import discord.utils
-import asyncio
 
 client = discord.Client()
 
