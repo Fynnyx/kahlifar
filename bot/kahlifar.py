@@ -112,6 +112,8 @@ async def on_member_join(member):
     #         await user.add_roles(role)
 
 
+# Error handling ------------------------------------------------------------
+
 @client.listen("on_error")
 async def log_error(error):
     guild = client.get_guild(814230131681132605)
