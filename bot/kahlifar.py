@@ -1,10 +1,11 @@
-from datetime import time
 import discord
 from discord.ext import commands
 import discord.utils
 from discord.member import Member
 import asyncio
 import json
+
+from log import log_to_console
 
 
 with open("properties.json") as f:
@@ -111,6 +112,11 @@ async def on_member_join(member):
     #         await user.add_roles(role)
 
 
+@client.listen("on_error")
+async def log_error(error):
+    await log_to_console(error, )
+
+
 # Help Command ---------------------------------------------------------------------------
 
 @client.command(pass_context=True, aliases=list(data["properties"]["commands"]["help"]["aliases"]))
@@ -169,6 +175,11 @@ async def social_media(ctx):
                                     colour=discord.Colour(0x9013fe))
 
     await ctx.channel.send(embed=sm_embed)
+
+@client.command()
+async def log(ctx):
+    await log_to_console("test", ctx.guild)
+
 
 
 client.run(TOKEN)

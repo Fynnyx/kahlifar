@@ -1,4 +1,3 @@
-from os import name
 import discord
 from discord import Member
 from discord.ext import commands
