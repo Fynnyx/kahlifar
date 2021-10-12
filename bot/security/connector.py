@@ -201,13 +201,14 @@ async def on_guild_role_update(before, after):
             await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
     # await guild.create_role(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
 
+
 # Error handling ------------------------------------------------------------
 
 # @client.listen("on_error")
 @client.event
 async def on_error(event, *args, **kwargs):
     guild = client.get_guild(814230131681132605)
-    await log_to_console("Error in " + event, guild)
+    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
 # @client.listen("on_command_error")
 @client.event
