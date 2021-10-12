@@ -199,7 +199,9 @@ async def on_guild_role_update(before, after):
     # await guild.create_role(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
 
 # MOD LOG
-# message delete
+@client.event
+async def on_message_delete(message):
+    print("lol")
 # message edit
 # member update
 # member ban
