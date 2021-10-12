@@ -1,6 +1,6 @@
 import discord
 from discord import Member
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord.utils
 import asyncio
 import json
@@ -38,6 +38,7 @@ client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=intents)
 
 # Tasks ---------------------------------------------------------------------------
 
+@tasks.loop(count=None)
 async def status_task():
     messages = data["properties"]["status"]["messages"]
     time = data["properties"]["status"]["time"]    
@@ -178,7 +179,7 @@ async def log_command_error(ctx, error):
 @client.event
 async def on_ready():
     print("%sKahlifar Security: logged in" % PREFIX)
-    client.loop.create_task(status_task())
+    status_task.start()
     await send_verify()
 
 async def send_verify():
