@@ -171,22 +171,47 @@ async def on_member_update(before, after):
 @client.event
 async def on_guild_role_create(role):
     if role.guild.id == data["properties"]["general"]["guild_id"]:
-        game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
-        await game_guild.create_role
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif role.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=role.name) == None:
+        await guild.create_role(name=role.name, permissions=role.permissions, colour=role.colour, hoist=role.hoist, mentionable=role.mentionable)
+
+@client.event
+async def on_guild_role_delete(role):
+    if role.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif role.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=role.name) != None:
+        other_role = discord.utils.get(guild.roles, name=role.name)
+        await other_role.delete()
+
+@client.event
+async def on_guild_role_update(before, after):
+    if after.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif after.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=before.name) != None:
+        other_role = discord.utils.get(guild.roles, name=before.name)
+        # if after.name != other_role.name or after.colour != other_role.colour or after.permissions != other_role.permissions or after.hoist != other_role.hoist or after.mentionable != other_role.mentionable or after.position != other_role.position:
+        #     await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable, position=after.position)
+        if after.name != other_role.name or after.colour != other_role.colour or after.permissions != other_role.permissions or after.hoist != other_role.hoist or after.mentionable != other_role.mentionable:
+            await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
+    # await guild.create_role(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
 
 # Error handling ------------------------------------------------------------
 
 # @client.listen("on_error")
 @client.event
-async def on_error(error):
-    print("error")
+async def on_error(event, *args, **kwargs):
     guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+    await log_to_console("Error in " + event, guild)
 
 # @client.listen("on_command_error")
 @client.event
 async def on_command_error(ctx, error):
-    print("command")
     guild = client.get_guild(814230131681132605)
     await log_to_console(error, guild)
 
