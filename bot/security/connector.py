@@ -1,4 +1,3 @@
-import sys, os
 import discord
 from discord import Member
 from discord.ext import commands
@@ -8,8 +7,6 @@ import json
 
 from log import log_to_console
 
-# sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'bot'))
-# import bot
 
 with open("properties.json", encoding="UTF-8") as f:
     data = json.load(f)
@@ -211,8 +208,6 @@ async def on_guild_role_update(before, after):
 # role create
 # role delete
 # role update
-
-
 
 
 
