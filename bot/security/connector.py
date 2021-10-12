@@ -201,6 +201,20 @@ async def on_guild_role_update(before, after):
             await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
     # await guild.create_role(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
 
+# MOD LOG
+# message delete
+# message edit
+# member update
+# member ban
+# member kick
+# member unban
+# role create
+# role delete
+# role update
+
+
+
+
 
 # Error handling ------------------------------------------------------------
 
