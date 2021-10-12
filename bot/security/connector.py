@@ -133,7 +133,6 @@ async def sync_user_roles(member_id, guild):
 async def on_member_join(member):
     game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
     game_member = discord.utils.get(game_guild.members, id=member.id)
-    print(game_member)
     if game_member != None:
         await sync_member(member)
 
@@ -158,8 +157,6 @@ async def on_reaction_add(reaction, user):
 @client.event
 async def on_member_update(before, after):
     if before.roles != after.roles:
-        # print(before.roles)
-        # print(after.roles)
         await sync_user_roles(after.id, after.guild)
     if before.nick != after.nick:
         await sync_nick(after.id, after.nick)
