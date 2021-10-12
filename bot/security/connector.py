@@ -1,10 +1,15 @@
-from os import name
+import sys, os
 import discord
 from discord import Member
 from discord.ext import commands
 import discord.utils
 import asyncio
 import json
+
+from log import log_to_console
+
+# sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'bot'))
+# import bot
 
 with open("properties.json", encoding="UTF-8") as f:
     data = json.load(f)
@@ -162,6 +167,28 @@ async def on_member_update(before, after):
         await sync_user_roles(after.id, after.guild)
     if before.nick != after.nick:
         await sync_nick(after.id, after.nick)
+
+@client.event
+async def on_guild_role_create(role):
+    if role.guild.id == data["properties"]["general"]["guild_id"]:
+        game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+        await game_guild.create_role
+
+# Error handling ------------------------------------------------------------
+
+# @client.listen("on_error")
+@client.event
+async def on_error(error):
+    print("error")
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
+
+# @client.listen("on_command_error")
+@client.event
+async def on_command_error(ctx, error):
+    print("command")
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
 
 # On Ready  ----------------------------------------------------------------------------
 

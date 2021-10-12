@@ -1,10 +1,11 @@
-from datetime import time
 import discord
 from discord.ext import commands
 import discord.utils
 from discord.member import Member
 import asyncio
 import json
+
+from log import log_to_console
 
 
 with open("properties.json") as f:
@@ -111,6 +112,19 @@ async def on_member_join(member):
     #         await user.add_roles(role)
 
 
+# Error handling ------------------------------------------------------------
+
+@client.listen("on_error")
+async def log_error(error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
+
+@client.listen("on_command_error")
+async def log_command_error(ctx, error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
+
+
 # Help Command ---------------------------------------------------------------------------
 
 @client.command(pass_context=True, aliases=list(data["properties"]["commands"]["help"]["aliases"]))
@@ -169,6 +183,12 @@ async def social_media(ctx):
                                     colour=discord.Colour(0x9013fe))
 
     await ctx.channel.send(embed=sm_embed)
+
+
+@client.command()
+async def log(ctx):
+    await log_to_console("test", ctx.guild)
+
 
 
 client.run(TOKEN)
