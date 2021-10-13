@@ -71,16 +71,6 @@
                 ],
                 "inline": false
             },
-            "clear": {
-                "description": "Delete messages. `clear, clear [amount], clear all`.",
-                "aliases": [],
-                "permissions": [
-                    "Helper",
-                    "Moderator",
-                    "Owner"
-                ],
-                "inline": false
-            },
             "rules": {
                 "description": "Send the rules embed",
                 "aliases": [],

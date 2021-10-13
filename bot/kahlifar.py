@@ -110,12 +110,12 @@ async def on_member_join(member):
 
 # Error handling ------------------------------------------------------------
 
-@client.listen("on_error")
+# @client.listen("on_error")
 async def log_error(error):
     guild = client.get_guild(814230131681132605)
     await log_to_console(error, guild)
 
-@client.listen("on_command_error")
+# @client.listen("on_command_error")
 async def log_command_error(ctx, error):
     guild = client.get_guild(814230131681132605)
     await log_to_console(error, guild)
@@ -161,6 +161,26 @@ async def krules(ctx):
         await krules_channel.send(embed=krules_embed)
     await ctx.message.delete()
 
+@client.command()
+async def infos(ctx):
+    if await check_permissions("infos", ctx.author, ctx.channel):
+        await ctx.message.delete()
+        with open("./assets/infos.json", encoding="UTF-8") as j:
+            info = json.load(j)
+        image_path = "./assets/images/"
+        channel = ctx.channel
+        await channel.purge()
+
+        await channel.send(file=discord.File(image_path+info["infos"]["file1"]))
+        await channel.send(info["infos"]["text1"] % (751097780004585483, 451776092785737728))
+        await channel.send(file=discord.File(image_path+info["infos"]["file2"]))
+        await channel.send(info["infos"]["text2"] % (835629559645995009, 838380050952486922, 835631187094667315, 863764198664175646, 896498793711812659, 815849652632027167, 836696030732877897, 836696294869041212))
+        await channel.send(file=discord.File(image_path+info["infos"]["file3"]))
+        await channel.send(info["infos"]["text3"] % (814231323224572006, 814234539773001778, 834483454968070164, 814523816818638868, 895288280269094983, 842867716523294741, 897781560038793226))
+    
+    else:
+        await ctx.message.delete()
+
 
 # Social Media ---------------------------------------------------------------------------
 
@@ -179,12 +199,6 @@ async def social_media(ctx):
                                     colour=discord.Colour(0x9013fe))
 
     await ctx.channel.send(embed=sm_embed)
-
-
-@client.command()
-async def log(ctx):
-    await log_to_console("test", ctx.guild)
-
 
 
 client.run(TOKEN)
