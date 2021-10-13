@@ -5,7 +5,8 @@ import discord.utils
 import asyncio
 import json
 
-from log import log_to_console
+from log import log_to_console, log_to_mod
+
 
 with open("properties.json", encoding="UTF-8") as f:
     data = json.load(f)
@@ -19,8 +20,8 @@ intents.dm_messages = True
 intents.dm_reactions= False
 intents.dm_typing= False
 intents.emojis = True
-intents.guild_messages = False
-intents.guild_reactions = False
+intents.guild_messages = True
+intents.guild_reactions = True
 intents.guild_typing = False
 intents.guilds = True
 intents.integrations = False
@@ -89,7 +90,6 @@ async def sync_member(member):
             await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
     else:
         await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
-
 
 async def is_verified(game_member, gen_member):
     for role in gen_member.roles:
@@ -162,15 +162,76 @@ async def on_member_update(before, after):
     if before.nick != after.nick:
         await sync_nick(after.id, after.nick)
 
+@client.event
+async def on_guild_role_create(role):
+    if role.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif role.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=role.name) == None:
+        await guild.create_role(name=role.name, permissions=role.permissions, colour=role.colour, hoist=role.hoist, mentionable=role.mentionable)
+    await log_to_mod("Role created\nRole Name: %s\nRole Guild: %s" % (role.mention, role.guild), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+
+@client.event
+async def on_guild_role_delete(role):
+    if role.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif role.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=role.name) != None:
+        other_role = discord.utils.get(guild.roles, name=role.name)
+        await other_role.delete()
+    await log_to_mod("Role deleted\nRole Name: %s\nRole Guild: %s" % (role.name, role.guild), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+
+@client.event
+async def on_guild_role_update(before, after):
+    if after.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif after.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=before.name) != None:
+        other_role = discord.utils.get(guild.roles, name=before.name)
+        # if after.name != other_role.name or after.colour != other_role.colour or after.permissions != other_role.permissions or after.hoist != other_role.hoist or after.mentionable != other_role.mentionable or after.position != other_role.position:
+        #     await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable, position=after.position)
+        if after.name != other_role.name or after.colour != other_role.colour or after.permissions != other_role.permissions or after.hoist != other_role.hoist or after.mentionable != other_role.mentionable:
+            await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
+    # await guild.create_role(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
+    if before.position == after.position:
+        await log_to_mod("Role updated\nRole **before:** %s\nRole **after:** %s" % (before, after), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.dark_green())
+
+# MOD LOG #################################################################
+@client.event
+async def on_message_delete(message):
+    if not message.author.bot:
+        await log_to_mod("Message deleted in %s\nMessage: %s" % (message.channel.mention, message.content), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+@client.event
+async def on_message_edit(before, after):
+    if not after.author.bot:
+        await log_to_mod("Message edited in %s\nMessage **before:** %s\nMessage **after:** %s" % (after.channel.mention, before.content, after.content), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+
+@client.event
+async def on_member_update(before, after):
+    await log_to_mod("Member updated\nMember: %s" % after.mention, guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.dark_green())
+
+@client.event
+async def on_member_ban(guild, user):
+    await log_to_mod("Member banned\nMember: %s\nGuild: %s" % (user.name, guild.name), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.red())
+@client.event
+async def on_member_unban(guild, user):
+    await log_to_mod("Member unbanned\nMember: %s\nGuild: %s" % (user.name, guild.name), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.red())
+
+
 # Error handling ------------------------------------------------------------
 
-@client.listen("on_error")
-async def log_error(error):
+# @client.listen("on_error")
+@client.event
+async def on_error(event, *args, **kwargs):
     guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
-@client.listen("on_command_error")
-async def log_command_error(ctx, error):
+# @client.listen("on_command_error")
+@client.event
+async def on_command_error(ctx, error):
     guild = client.get_guild(814230131681132605)
     await log_to_console(error, guild)
 

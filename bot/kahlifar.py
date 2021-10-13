@@ -107,13 +107,6 @@ async def on_member_join(member):
     await member.add_roles(basic_member_role)
     await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
 
-    # # SELF ROLES
-    # for self_role in data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"]:
-    #     if reaction.emoji == str(self_role):
-    #         gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
-    #         role = discord.utils.get(gen_guild.roles, id=data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"][str(self_role)]["role"])
-    #         await user.add_roles(role)
-
 
 # Error handling ------------------------------------------------------------
 
