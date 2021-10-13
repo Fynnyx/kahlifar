@@ -102,7 +102,6 @@ async def sync_nick(member, nick):
         guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
     elif member.guild.id == data["properties"]["gaming"]["guild_id"]:
         guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
-    # game_user = discord.utils.get(game_guild.members, id=member.id)
     if discord.utils.get(guild.members, id=member.id) != None:
         guild_user = discord.utils.get(guild.members, id=member.id)
         try:
@@ -298,7 +297,17 @@ async def send_deleted_msgs(amount, channel):
 
 @client.command()
 async def sync(ctx):
-    await sync_roles_user(ctx.author)
+    try:
+        await sync_roles_user(ctx.author)
+        await sync_nick(ctx.author, ctx.author.display_name)
+        msg = await ctx.channel.send("🔄 - Synchronization successful✔")
+        await asyncio.sleep(2)
+        await msg.delete()
+    except:
+        msg = await ctx.channel.send("🔄 - Synchronization failed❌\nContact the Owner")
+        await asyncio.sleep(2)
+        await msg.delete()
+
 
 
 client.run(TOKEN)
