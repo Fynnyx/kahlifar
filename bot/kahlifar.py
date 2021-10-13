@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord.utils
 from discord.member import Member
 import asyncio
@@ -40,9 +40,9 @@ intents.webhooks= False
 
 client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=intents)
 
+# Tasks ---------------------------------------------------------------------------
 
-# Functions ---------------------------------------------------------------------------
-
+@tasks.loop(count=None)
 async def status_task():
     messages = data["properties"]["status"]["messages"]
     time = data["properties"]["status"]["time"]    
@@ -50,6 +50,9 @@ async def status_task():
         for x in range(len(messages)):
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
+
+
+# Functions ---------------------------------------------------------------------------
 
 async def get_embed(file:str):
     with open("./assets/embeds/%s" % file, encoding="UTF-8") as e:
@@ -89,8 +92,8 @@ async def send_error(error, channel):
 
 @client.event
 async def on_ready():
+    status_task.start()
     print("Kahlifar: logged in")
-    client.loop.create_task(status_task())
 
 
 # Events ---------------------------------------------------------------------------
