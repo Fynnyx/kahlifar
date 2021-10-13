@@ -4,6 +4,9 @@
         "text1": "**Willkommen auf dem Kahlifar Server/Netzwerk🌐**\nWir sind <@%s> und <@%s> und sind die Owner von diesem Server.\n\n*Um was sind handelt dieser Server?*\nAuf diesem Server können sich Leute zusammenfinden:people_hugging: und einer gemeinsamen Interesse nachgehen. **Und zwar dem Gaming🎮.**Gestartet bei nur einem Minecraft Survivalprojet ist der Server über sich hinausgewachsen🆙 und ist schon lange kein *'Minecraft only'* Server mehr. Hier kannst du neue Leute kennenlernen, neue Spiele kennenlernen und vor allem Spass haben.😂\n",
         
         "file2": "channel.png",
-        "text2": "Channel"
+        "text2": "**Die wichtigsten Channel/Kategorien kurz erklärt**\nJeder Channel sollte eine Beschreibung haben. Dort findest immer Informationen für was der Channel geeignet ist.\n\n- <#%s>  🢂  Der Channel in dem du wichtige Informationen bekommst.\n- <#%s>  🢂  Werde auf dem laufenden gehalten wenn wichtige Dinge anstehen.\n- <#%s>  🢂  Hier stehen die Regeln die auf dem Netzwerk gelten.\n- <#%s>  🢂  In diesem Channel kannst du dir eigene Rollen hinzufügen.\n- <#%s>  🢂  Damit wir nicht jede Frage 100x beantworten müssen.\n- <#%s>  🢂  Dort kannst du uns sagen falls etwas nicht funktioniert.\n\n- **%s**  🢂  In der Kategorie kannst du uns mithelfen den Server zu gestalten.\n\nGenerell sollten alle Channel selbsterklärend sein. Sonst kannst du gerne in <#%s> fragen. Viel Spass beim Schreiben🖊.",
+
+        "file3": "roles.png",
+        "text3": ""
     }
 }
