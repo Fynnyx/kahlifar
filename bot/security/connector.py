@@ -1,11 +1,12 @@
 import discord
 from discord import Member
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord.utils
 import asyncio
 import json
 
-from log import log_to_console
+from log import log_to_console, log_to_mod
+
 
 with open("properties.json", encoding="UTF-8") as f:
     data = json.load(f)
@@ -19,8 +20,8 @@ intents.dm_messages = True
 intents.dm_reactions= False
 intents.dm_typing= False
 intents.emojis = True
-intents.guild_messages = False
-intents.guild_reactions = False
+intents.guild_messages = True
+intents.guild_reactions = True
 intents.guild_typing = False
 intents.guilds = True
 intents.integrations = False
@@ -38,6 +39,7 @@ client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=intents)
 
 # Tasks ---------------------------------------------------------------------------
 
+@tasks.loop(count=None)
 async def status_task():
     messages = data["properties"]["status"]["messages"]
     time = data["properties"]["status"]["time"]    
@@ -77,54 +79,65 @@ async def verify_user(user):
     await user.add_roles(role)
     await user.remove_roles(rm_role)
 
+
+async def is_verified(gen_member):
+    for role in gen_member.roles:
+        if role.id == data["properties"]["general"]["events"]["on_reaction_add"]["verify"]["role"]:
+            return True
+
 async def sync_member(member):
     gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
     gen_member = discord.utils.get(gen_guild.members, id=member.id)
     if gen_member != None:
-        if await is_verified(member, gen_member):
+        if await is_verified(gen_member):
             await sync_nick(member.id, gen_member.display_name)
-            await sync_roles(member, gen_member)
+            await sync_roles_user(gen_member)
         else:
             await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
     else:
         await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
 
+async def sync_nick(member, nick):
+    if member.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif member.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.members, id=member.id) != None:
+        guild_user = discord.utils.get(guild.members, id=member.id)
+        try:
+            await guild_user.edit(nick=nick)
+        except discord.errors.Forbidden:
+            return
 
-async def is_verified(game_member, gen_member):
-    for role in gen_member.roles:
-        if role.id == data["properties"]["general"]["events"]["on_reaction_add"]["verify"]["role"]:
-            return True
-
-async def sync_nick(member_id, nick):
-    gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
-    game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
-    gen_user = discord.utils.get(gen_guild.members, id=member_id)
-    game_user = discord.utils.get(game_guild.members, id=member_id)
-    try:
-        await gen_user.edit(nick=nick)
-        await game_user.edit(nick=nick)
-    except discord.errors.Forbidden:
-        return
-
-async def sync_roles(member, gen_member):
-    await member.remove_roles()
-    for role in gen_member.roles:
-        if discord.utils.get(member.guild.roles, name=role.name) and str(role.name) != "@everyone":
-            game_role = discord.utils.get(member.guild.roles, name=role.name)
-            await member.add_roles(game_role)
-
-async def sync_user_roles(member_id, guild):
-    if guild.id == data["properties"]["general"]["guild_id"]:
-        gen_guild = guild
-        game_guild = discord.utils.get(client.guilds, id=(data["properties"]["gaming"]["guild_id"]))
-        game_user = discord.utils.get(game_guild.members, id=member_id)
-        gen_user = discord.utils.get(gen_guild.members, id=member_id)
-        if game_user != None:
-            await game_user.remove_roles()
-            for role in gen_user.roles:
-                if discord.utils.get(game_guild.roles, name=role.name) and str(role.name) != "@everyone":
-                    game_role = discord.utils.get(game_guild.roles, name=role.name)
-                    await game_user.add_roles(game_role)
+async def sync_roles_user(member):
+    if member.guild.id == data["properties"]["general"]["guild_id"]:
+        changed_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif member.guild.id == data["properties"]["gaming"]["guild_id"]:
+        changed_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.members, id=member.id) != None:
+        guild_member = discord.utils.get(guild.members, id=member.id)
+        changed_member = discord.utils.get(changed_guild.members, id=member.id)
+        changed_roles = []
+        guild_roles = []
+        for role in changed_member.roles:
+            if str(role.name) != "@everyone":
+                changed_roles.append(str(role.name))
+        for role in guild_member.roles:
+            if str(role.name) != "@everyone":
+                guild_roles.append(str(role.name))
+        
+        for role in changed_roles:
+            if role not in guild_roles:
+                if discord.utils.get(guild.roles, name=role) != None:
+                    add_role = discord.utils.get(guild.roles, name=role)
+                    await guild_member.add_roles(add_role)
+        for role in guild_roles:
+            if role not in changed_roles:
+                if discord.utils.get(guild.roles, name=role) != None:
+                    remove_role = discord.utils.get(guild.roles, name=role)
+                    await guild_member.remove_roles(remove_role)
 
 
 # Listerners    ----------------------------------------------------------------------------
@@ -133,7 +146,6 @@ async def sync_user_roles(member_id, guild):
 async def on_member_join(member):
     game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
     game_member = discord.utils.get(game_guild.members, id=member.id)
-    print(game_member)
     if game_member != None:
         await sync_member(member)
 
@@ -158,30 +170,87 @@ async def on_reaction_add(reaction, user):
 @client.event
 async def on_member_update(before, after):
     if before.roles != after.roles:
-        # print(before.roles)
-        # print(after.roles)
-        await sync_user_roles(after.id, after.guild)
+        await sync_roles_user(after)
     if before.nick != after.nick:
-        await sync_nick(after.id, after.nick)
+        await sync_nick(after, after.nick)
+    await log_to_mod("Member updated\nMember: %s" % after.mention, guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.dark_green())
+    
+
+@client.event
+async def on_guild_role_create(role):
+    if role.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif role.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=role.name) == None:
+        await guild.create_role(name=role.name, permissions=role.permissions, colour=role.colour, hoist=role.hoist, mentionable=role.mentionable)
+    await log_to_mod("Role created\nRole Name: %s\nRole Guild: %s" % (role.mention, role.guild), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+
+@client.event
+async def on_guild_role_delete(role):
+    if role.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif role.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=role.name) != None:
+        other_role = discord.utils.get(guild.roles, name=role.name)
+        await other_role.delete()
+    await log_to_mod("Role deleted\nRole Name: %s\nRole Guild: %s" % (role.name, role.guild), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+
+@client.event
+async def on_guild_role_update(before, after):
+    if after.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif after.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.roles, name=before.name) != None:
+        other_role = discord.utils.get(guild.roles, name=before.name)
+        # if after.name != other_role.name or after.colour != other_role.colour or after.permissions != other_role.permissions or after.hoist != other_role.hoist or after.mentionable != other_role.mentionable or after.position != other_role.position:
+        #     await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable, position=after.position)
+        if after.name != other_role.name or after.colour != other_role.colour or after.permissions != other_role.permissions or after.hoist != other_role.hoist or after.mentionable != other_role.mentionable:
+            await other_role.edit(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
+    # await guild.create_role(name=after.name, permissions=after.permissions, colour=after.colour, hoist=after.hoist, mentionable=after.mentionable)
+    if before.position == after.position:
+        await log_to_mod("Role updated\nRole **before:** %s\nRole **after:** %s" % (before, after), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.dark_green())
+
+# MOD LOG #################################################################
+@client.event
+async def on_message_delete(message):
+    if not message.author.bot:
+        await log_to_mod("Message deleted in %s\nMessage: %s" % (message.channel.mention, message.content), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+@client.event
+async def on_message_edit(before, after):
+    if not after.author.bot:
+        await log_to_mod("Message edited in %s\nMessage **before:** %s\nMessage **after:** %s" % (after.channel.mention, before.content, after.content), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.orange())
+
+@client.event
+async def on_member_ban(guild, user):
+    await log_to_mod("Member banned\nMember: %s\nGuild: %s" % (user.name, guild.name), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.red())
+@client.event
+async def on_member_unban(guild, user):
+    await log_to_mod("Member unbanned\nMember: %s\nGuild: %s" % (user.name, guild.name), guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.red())
+
 
 # Error handling ------------------------------------------------------------
 
-@client.listen("on_error")
-async def log_error(error):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+# # @client.listen("on_error")
+# @client.event
+# async def on_error(event, *args, **kwargs):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
-@client.listen("on_command_error")
-async def log_command_error(ctx, error):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+# # @client.listen("on_command_error")
+# @client.event
+# async def on_command_error(ctx, error):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console(error, guild)
 
 # On Ready  ----------------------------------------------------------------------------
 
 @client.event
 async def on_ready():
     print("%sKahlifar Security: logged in" % PREFIX)
-    client.loop.create_task(status_task())
+    status_task.start()
     await send_verify()
 
 async def send_verify():
@@ -228,7 +297,17 @@ async def send_deleted_msgs(amount, channel):
 
 @client.command()
 async def sync(ctx):
-    await sync_member(ctx.author)
+    try:
+        await sync_roles_user(ctx.author)
+        await sync_nick(ctx.author, ctx.author.display_name)
+        msg = await ctx.channel.send("🔄 - Synchronization successful✔")
+        await asyncio.sleep(2)
+        await msg.delete()
+    except:
+        msg = await ctx.channel.send("🔄 - Synchronization failed❌\nContact the Owner")
+        await asyncio.sleep(2)
+        await msg.delete()
+
 
 
 client.run(TOKEN)

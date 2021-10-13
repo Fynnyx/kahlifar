@@ -1,6 +1,5 @@
 import discord
-from discord import channel
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord.utils
 from discord.member import Member
 import asyncio
@@ -41,9 +40,9 @@ intents.webhooks= False
 
 client = commands.Bot(command_prefix=PREFIX, help_command=None, intents=intents)
 
+# Tasks ---------------------------------------------------------------------------
 
-# Functions ---------------------------------------------------------------------------
-
+@tasks.loop(count=None)
 async def status_task():
     messages = data["properties"]["status"]["messages"]
     time = data["properties"]["status"]["time"]    
@@ -51,6 +50,9 @@ async def status_task():
         for x in range(len(messages)):
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
+
+
+# Functions ---------------------------------------------------------------------------
 
 async def get_embed(file:str):
     with open("./assets/embeds/%s" % file, encoding="UTF-8") as e:
@@ -90,8 +92,8 @@ async def send_error(error, channel):
 
 @client.event
 async def on_ready():
+    status_task.start()
     print("Kahlifar: logged in")
-    client.loop.create_task(status_task())
 
 
 # Events ---------------------------------------------------------------------------
@@ -105,25 +107,18 @@ async def on_member_join(member):
     await member.add_roles(basic_member_role)
     await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
 
-    # # SELF ROLES
-    # for self_role in data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"]:
-    #     if reaction.emoji == str(self_role):
-    #         gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
-    #         role = discord.utils.get(gen_guild.roles, id=data["properties"]["gaming"]["events"]["on_reaction_add"]["self_roles"][str(self_role)]["role"])
-    #         await user.add_roles(role)
-
 
 # Error handling ------------------------------------------------------------
 
 # @client.listen("on_error")
-# async def log_error(error):
-#     guild = client.get_guild(814230131681132605)
-#     await log_to_console(error, guild)
+async def log_error(error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
 
 # @client.listen("on_command_error")
-# async def log_command_error(ctx, error):
-#     guild = client.get_guild(814230131681132605)
-#     await log_to_console(error, guild)
+async def log_command_error(ctx, error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
 
 
 # Help Command ---------------------------------------------------------------------------
