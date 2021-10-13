@@ -26,6 +26,10 @@
         "krules":{
             "channel": 896877068187484181
         },
+        "infos":{
+            "wolfi": 751097780004585483,
+            "fynnyx": 451776092785737728
+        },
         "commands": {
             "help": {
                 "description": "Show all available commands with description.",
@@ -71,6 +75,16 @@
                 ],
                 "inline": false
             },
+            "clear": {
+                "description": "Delete messages. `clear, clear [amount], clear all`.",
+                "aliases": [],
+                "permissions": [
+                    "Helper",
+                    "Moderator",
+                    "Owner"
+                ],
+                "inline": false
+            },
             "rules": {
                 "description": "Send the rules embed",
                 "aliases": [],
@@ -81,6 +95,14 @@
             },
             "krules": {
                 "description": "Send the kahlifar rules embed",
+                "aliases": [],
+                "permissions": [
+                    "Owner"
+                ],
+                "inline": false
+            },
+            "infos": {
+                "description": "Send the kahlifar information",
                 "aliases": [],
                 "permissions": [
                     "Owner"
