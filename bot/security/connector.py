@@ -97,16 +97,17 @@ async def sync_member(member):
     else:
         await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
 
-async def sync_nick(member_id, nick):
-    gen_guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
-    game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
-    gen_user = discord.utils.get(gen_guild.members, id=member_id)
-    game_user = discord.utils.get(game_guild.members, id=member_id)
-    try:
-        await gen_user.edit(nick=nick)
-        await game_user.edit(nick=nick)
-    except discord.errors.Forbidden:
-        return
+async def sync_nick(member, nick):
+    if member.guild.id == data["properties"]["general"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
+    elif member.guild.id == data["properties"]["gaming"]["guild_id"]:
+        guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    if discord.utils.get(guild.members, id=member.id) != None:
+        guild_user = discord.utils.get(guild.members, id=member.id)
+        try:
+            await guild_user.edit(nick=nick)
+        except discord.errors.Forbidden:
+            return
 
 async def sync_roles_user(member):
     if member.guild.id == data["properties"]["general"]["guild_id"]:
@@ -171,7 +172,7 @@ async def on_member_update(before, after):
     if before.roles != after.roles:
         await sync_roles_user(after)
     if before.nick != after.nick:
-        await sync_nick(after.id, after.nick)
+        await sync_nick(after, after.nick)
     await log_to_mod("Member updated\nMember: %s" % after.mention, guild=discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"]), colour=discord.Colour.dark_green())
     
 
@@ -296,7 +297,17 @@ async def send_deleted_msgs(amount, channel):
 
 @client.command()
 async def sync(ctx):
-    await sync_roles_user(ctx.author)
+    try:
+        await sync_roles_user(ctx.author)
+        await sync_nick(ctx.author, ctx.author.display_name)
+        msg = await ctx.channel.send("🔄 - Synchronization successful✔")
+        await asyncio.sleep(2)
+        await msg.delete()
+    except:
+        msg = await ctx.channel.send("🔄 - Synchronization failed❌\nContact the Owner")
+        await asyncio.sleep(2)
+        await msg.delete()
+
 
 
 client.run(TOKEN)
