@@ -1,4 +1,5 @@
 from datetime import datetime
+from discord.errors import HTTPException
 import discord
 import discord.utils
 
@@ -20,4 +21,7 @@ async def log_to_mod(message, guild, colour):
 
     log_embed = discord.Embed(title="Time = %s" % (now_time.strftime("%H:%M:%S")), colour=colour)
     log_embed.add_field(name="---------------", value=message, inline=False)
-    await channel.send(embed=log_embed)
+    try:
+        await channel.send(embed=log_embed)
+    except HTTPException:
+        await channel.send("Error occurred but Error was to long")

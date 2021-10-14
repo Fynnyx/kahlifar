@@ -1,4 +1,5 @@
 import discord
+from discord.errors import NotFound
 from discord.ext import commands, tasks
 import discord.utils
 from discord.member import Member
@@ -23,8 +24,8 @@ intents.dm_messages = True
 intents.dm_reactions= False
 intents.dm_typing= False
 intents.emojis = True
-intents.guild_messages = False
-intents.guild_reactions = False
+intents.guild_messages = True
+intents.guild_reactions = True
 intents.guild_typing = False
 intents.guilds = True
 intents.integrations = False
@@ -87,6 +88,10 @@ async def send_error(error, channel):
     await asyncio.sleep(5)
     await msg.delete()
 
+async def update_embed(message, embed):
+    if message:
+        await message.edit(embed=embed)
+
 
 # On Ready ---------------------------------------------------------------------------
 
@@ -103,9 +108,10 @@ async def on_member_join(member):
     welcome_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["channel"])
     welcome_message = data["properties"]["events"]["on_member_join"]["message"]
     info_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["info_channel"])
+    verify_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["verify_channel"])
     basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"]["events"]["on_member_join"]["role_id"]))
     await member.add_roles(basic_member_role)
-    await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
+    await welcome_channel.send(welcome_message % (str(member.mention), str(verify_channel.id), str(info_channel.id)))
 
 
 # Error handling ------------------------------------------------------------
@@ -146,20 +152,61 @@ async def send_help_embed(ctx):
 @client.command()
 async def rules(ctx):
     if await check_permissions("rules", ctx.author, ctx.channel):
-        rule_embed = await get_embed("rules.json")
-        rule_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rule"]["channel"])
-        await rule_channel.purge()
-        await rule_channel.send(embed=rule_embed)
-    await ctx.message.delete()
+        with open("properties.json") as f:
+            data = json.load(f)
+        await ctx.message.delete()
+        krules_embed = await get_embed("rules.json")
+        krules_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rules"]["channel"])
+        try:
+            message = await ctx.fetch_message(data["properties"]["rules"]["message"])
+            await update_embed(message, krules_embed)
+        except NotFound:
+            await krules_channel.purge()
+            msg = await krules_channel.send(embed=krules_embed)
+            data["properties"]["rules"]["message"] = int(msg.id)
+            with open("properties.json", 'w') as j:
+                j.write(json.dumps(data, indent=2))
+    else:
+        await ctx.message.delete()
 
 @client.command()
 async def krules(ctx):
     if await check_permissions("krules", ctx.author, ctx.channel):
+        with open("properties.json") as f:
+            data = json.load(f)
+        await ctx.message.delete()
         krules_embed = await get_embed("k-rules.json")
         krules_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["krules"]["channel"])
-        await krules_channel.purge()
-        await krules_channel.send(embed=krules_embed)
-    await ctx.message.delete()
+        try:
+            message = await ctx.fetch_message(data["properties"]["krules"]["message"])
+            await update_embed(message, krules_embed)
+        except NotFound:
+            await krules_channel.purge()
+            msg = await krules_channel.send(embed=krules_embed)
+            data["properties"]["krules"]["message"] = int(msg.id)
+            with open("properties.json", 'w') as j:
+                j.write(json.dumps(data, indent=2))
+    else:
+        await ctx.message.delete()
+
+@client.command()
+async def faq(ctx):
+    if await check_permissions("faq", ctx.author, ctx.channel):
+        with open("properties.json") as f:
+            data = json.load(f)
+        await ctx.message.delete()
+        channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["faq"]["channel"])
+        embed = await get_embed("faq.json")
+        try:
+            message = await ctx.fetch_message(data["properties"]["faq"]["message"])
+            await update_embed(message, embed)
+        except NotFound:
+            await channel.purge()
+            msg = await channel.send(embed=embed)
+            data["properties"]["faq"]["message"] = int(msg.id)
+            with open("properties.json", 'w') as j:
+                j.write(json.dumps(data, indent=2))
+            
 
 @client.command()
 async def infos(ctx):
