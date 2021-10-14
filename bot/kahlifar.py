@@ -103,9 +103,10 @@ async def on_member_join(member):
     welcome_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["channel"])
     welcome_message = data["properties"]["events"]["on_member_join"]["message"]
     info_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["info_channel"])
+    verify_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["verify_channel"])
     basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"]["events"]["on_member_join"]["role_id"]))
     await member.add_roles(basic_member_role)
-    await welcome_channel.send(welcome_message % (str(member.mention), str(info_channel.id)))
+    await welcome_channel.send(welcome_message % (str(member.mention), str(verify_channel.id), str(info_channel.id)))
 
 
 # Error handling ------------------------------------------------------------
