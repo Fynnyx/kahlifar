@@ -90,7 +90,7 @@ async def sync_member(member):
     gen_member = discord.utils.get(gen_guild.members, id=member.id)
     if gen_member != None:
         if await is_verified(gen_member):
-            await sync_nick(member.id, gen_member.display_name)
+            await sync_nick(member, gen_member.display_name)
             await sync_roles_user(gen_member)
         else:
             await member.send(data["properties"]["general"]["events"]["sync_member"]["nv_message"] % (data["properties"]["general"]["infinite_invite"]))
