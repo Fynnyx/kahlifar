@@ -1,0 +1,19 @@
+{
+    "embed": {
+        "title": "❓ - Frequently Asked Questions - ❓",
+        "description": "Damit wir nicht jede Frage 10x beantworten müssen findet ihr hier die häufig gestellten Fragen.",
+        "color": 4880535,
+        "fields": [
+            {
+                "name": "`Q:` Warum sehe ich nichts?",
+                "value": "**A:** *Stelle sicher, dass du die Member Rolle hast (reagiere in #verify✅)*",
+                "inline": false
+            },
+            {
+                "name": "`Q:` Wann startet Kahlifar 3?",
+                "value": "**A:** *Sobald die 1.18 draussen ist (ca. Anfang Dezember)*",
+                "inline": false
+            }
+        ]
+    }
+}

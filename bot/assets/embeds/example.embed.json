@@ -6,7 +6,8 @@
         "fields": [
             {
                 "name": "NAME",
-                "value": "VALUE"
+                "value": "VALUE",
+                "inline": false
             }
         ]
     }
