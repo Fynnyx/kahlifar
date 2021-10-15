@@ -23,7 +23,7 @@
           "verify": {
             "channel": 895385320848236574,
             "role": 814523816818638868,
-            "message_id": 896155324292141107,
+            "message_id": 898573848121856020,
             "emoji": "\u2705",
             "message": "By clicking/tapping the %s you agree with the rules on this Server."
           }
@@ -67,7 +67,26 @@
         "permissions": [
           "Helper",
           "Moderator",
-          "~ Discord Owner"
+          "Owner"
+        ],
+        "inline": false
+      },
+      "kick": {
+        "description": "Kick a Member. `kick @Member reason",
+        "aliases": [],
+        "permissions": [
+          "Helper",
+          "Moderator",
+          "Owner"
+        ],
+        "inline": false
+      },
+      "ban": {
+        "description": "Ban a Member. `ban @Member reason",
+        "aliases": [],
+        "permissions": [
+          "Moderator",
+          "Owner"
         ],
         "inline": false
       },

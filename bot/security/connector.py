@@ -239,17 +239,17 @@ async def on_member_unban(guild, user):
 
 # Error handling ------------------------------------------------------------
 
-# # @client.listen("on_error")
-# @client.event
-# async def on_error(event, *args, **kwargs):
-#     guild = client.get_guild(814230131681132605)
-#     await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
+# @client.listen("on_error")
+@client.event
+async def on_error(event, *args, **kwargs):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
-# # @client.listen("on_command_error")
-# @client.event
-# async def on_command_error(ctx, error):
-#     guild = client.get_guild(814230131681132605)
-#     await log_to_console(error, guild)
+# @client.listen("on_command_error")
+@client.event
+async def on_command_error(ctx, error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
 
 # On Ready  ----------------------------------------------------------------------------
 
@@ -310,6 +310,21 @@ async def sync(ctx):
         await msg.delete()
 
 @client.command()
+async def ban(ctx, member, *reason):
+    if type(member) == discord.Member:
+        message = ""
+        if await check_permissions('ban', ctx.author, ctx.channel):
+            for x in reason:
+                message = message + str(x)
+            await member.send("Du wurdest gebannt (Entbannungsantrag an `Fynnyx#4024`):\nGrund: %s" % message)
+            await member.ban()
+            await member.unban()
+        else:
+            await ctx.message.delete()
+    else:
+        await ctx.channel.send("Angegebener Member ist keine Member. Versuch es nochmal mit `@Member`")
+
+@client.command()
 async def kick(ctx, member:Member, *reason):
     message = ""
     if await check_permissions('kick', ctx.author, ctx.channel):
@@ -319,7 +334,5 @@ async def kick(ctx, member:Member, *reason):
         await member.kick()
     else:
         ctx.message.delete()
-
-
 
 client.run(TOKEN)
