@@ -1,0 +1,14 @@
+{
+    "embed": {
+        "title": "Kahlifar Discord Infos",
+        "description": "Hier findest du Informationen über den Discord-Server.",
+        "color": 9442302,
+        "fields": [
+            {
+                "name": "NAME",
+                "value": "VALUE",
+                "inline": false
+            }
+        ]
+    }
+}

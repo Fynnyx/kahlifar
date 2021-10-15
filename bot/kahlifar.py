@@ -249,11 +249,11 @@ async def server_ip(ctx):
 
 @client.command(pass_context=True, aliases=list(data["properties"]["commands"]["social_media"]["aliases"]))
 async def social_media(ctx):
-    sm_embed = discord.Embed(title="Social Media Links für Kahlifar",
-                                    description="Hier werden dir alle Informationen über die verschiedenen Commands die der <@%s> kann, welche Aliasse er hat und wer die Rechte hat den Command zu benutzen." % str(client.user.id),
-                                    colour=discord.Colour(0x9013fe))
-
+    sm_embed = await get_embed("social_media.json")
     await ctx.channel.send(embed=sm_embed)
+
+
+
 
 
 client.run(TOKEN)
