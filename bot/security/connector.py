@@ -318,7 +318,6 @@ async def ban(ctx, member, *reason):
                 message = message + str(x)
             await member.send("Du wurdest gebannt (Entbannungsantrag an `Fynnyx#4024`).\nGrund: %s" % message)
             await member.ban()
-            await member.unban()
         else:
             await ctx.message.delete()
     else:
@@ -332,8 +331,7 @@ async def kick(ctx, member, *reason):
             for x in reason:
                 message = message + str(x)
             await member.send("Du wurdest gekick.\nGrund: %s" % message)
-            await member.ban()
-            await member.unban()
+            await member.kick()
         else:
             await ctx.message.delete()
     else:
