@@ -1,4 +1,5 @@
 import discord
+from discord.errors import NotFound
 from discord.ext import commands, tasks
 import discord.utils
 from discord.member import Member
@@ -23,8 +24,8 @@ intents.dm_messages = True
 intents.dm_reactions= False
 intents.dm_typing= False
 intents.emojis = True
-intents.guild_messages = False
-intents.guild_reactions = False
+intents.guild_messages = True
+intents.guild_reactions = True
 intents.guild_typing = False
 intents.guilds = True
 intents.integrations = False
@@ -50,6 +51,12 @@ async def status_task():
         for x in range(len(messages)):
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
+
+@tasks.loop(seconds=10, count=None)
+async def update_json():
+    with open("properties.json") as f:
+        global data
+        data = json.load(f)
 
 
 # Functions ---------------------------------------------------------------------------
@@ -87,12 +94,17 @@ async def send_error(error, channel):
     await asyncio.sleep(5)
     await msg.delete()
 
+async def update_embed(message, embed):
+    if message:
+        await message.edit(embed=embed)
+
 
 # On Ready ---------------------------------------------------------------------------
 
 @client.event
 async def on_ready():
     status_task.start()
+    update_json.start()
     print("Kahlifar: logged in")
 
 
@@ -112,12 +124,14 @@ async def on_member_join(member):
 # Error handling ------------------------------------------------------------
 
 # @client.listen("on_error")
-async def log_error(error):
+@client.event
+async def on_error(event, *args, **kwargs):
     guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
 # @client.listen("on_command_error")
-async def log_command_error(ctx, error):
+@client.event
+async def on_command_error(ctx, error):
     guild = client.get_guild(814230131681132605)
     await log_to_console(error, guild)
 
@@ -147,20 +161,61 @@ async def send_help_embed(ctx):
 @client.command()
 async def rules(ctx):
     if await check_permissions("rules", ctx.author, ctx.channel):
-        rule_embed = await get_embed("rules.json")
-        rule_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rule"]["channel"])
-        await rule_channel.purge()
-        await rule_channel.send(embed=rule_embed)
-    await ctx.message.delete()
+        with open("properties.json") as f:
+            data = json.load(f)
+        await ctx.message.delete()
+        krules_embed = await get_embed("rules.json")
+        krules_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["rules"]["channel"])
+        try:
+            message = await ctx.fetch_message(data["properties"]["rules"]["message"])
+            await update_embed(message, krules_embed)
+        except NotFound:
+            await krules_channel.purge()
+            msg = await krules_channel.send(embed=krules_embed)
+            data["properties"]["rules"]["message"] = int(msg.id)
+            with open("properties.json", 'w') as j:
+                j.write(json.dumps(data, indent=2))
+    else:
+        await ctx.message.delete()
 
 @client.command()
 async def krules(ctx):
     if await check_permissions("krules", ctx.author, ctx.channel):
+        with open("properties.json") as f:
+            data = json.load(f)
+        await ctx.message.delete()
         krules_embed = await get_embed("k-rules.json")
         krules_channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["krules"]["channel"])
-        await krules_channel.purge()
-        await krules_channel.send(embed=krules_embed)
-    await ctx.message.delete()
+        try:
+            message = await ctx.fetch_message(data["properties"]["krules"]["message"])
+            await update_embed(message, krules_embed)
+        except NotFound:
+            await krules_channel.purge()
+            msg = await krules_channel.send(embed=krules_embed)
+            data["properties"]["krules"]["message"] = int(msg.id)
+            with open("properties.json", 'w') as j:
+                j.write(json.dumps(data, indent=2))
+    else:
+        await ctx.message.delete()
+
+@client.command()
+async def faq(ctx):
+    if await check_permissions("faq", ctx.author, ctx.channel):
+        with open("properties.json") as f:
+            data = json.load(f)
+        await ctx.message.delete()
+        channel = discord.utils.get(ctx.guild.channels, id=data["properties"]["faq"]["channel"])
+        embed = await get_embed("faq.json")
+        try:
+            message = await ctx.fetch_message(data["properties"]["faq"]["message"])
+            await update_embed(message, embed)
+        except NotFound:
+            await channel.purge()
+            msg = await channel.send(embed=embed)
+            data["properties"]["faq"]["message"] = int(msg.id)
+            with open("properties.json", 'w') as j:
+                j.write(json.dumps(data, indent=2))
+            
 
 @client.command()
 async def infos(ctx):
@@ -178,7 +233,6 @@ async def infos(ctx):
         await channel.send(info["infos"]["text2"] % (835629559645995009, 838380050952486922, 835631187094667315, 863764198664175646, 896498793711812659, 815849652632027167, 836696030732877897, 836696294869041212))
         await channel.send(file=discord.File(image_path+info["infos"]["file3"]))
         await channel.send(info["infos"]["text3"] % (814231323224572006, 814234539773001778, 834483454968070164, 814523816818638868, 895288280269094983, 842867716523294741, 897781560038793226))
-    
     else:
         await ctx.message.delete()
 

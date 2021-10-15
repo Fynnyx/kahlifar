@@ -1,101 +1,115 @@
 {
     "properties": {
-        "token": "",
-        "prefix": "-",
-        "discord_link": "https://discord.gg/jyuPtTEGuV",
-        "server_ip": "test.play-mc.de",
-        "status": {
-            "time": 7,
-            "messages": [
-                "DiscordLink: https://discord.gg/jyuPtTEGuV",
-                "ServerIP: test.play-mc.de",
-                "NEWS: Server startet am XX.XX.XXXX"
-            ]
-        },
-        "events": {
-            "on_member_join": {
-                "role_id": 895288280269094983,
-                "channel": 814232744892301342,
-                "info_channel": 835629559645995009,
-                "verify_channel": 895385320848236574,
-                "message": "Hey, %s Willkommen auf dem Kahlifar Discord \ud83c\udf86.\nUm mit diesem Discord zu interagieren musst du dich im <#%s>-Channel verifizieren.\nIm <#%s>-Channel bekommst du Inforamtionen \u00fcber diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber\ud83d\uddfa\ufe0f."
-            }
-        },
-        "rule": {
-            "channel": 835631187094667315
-        },
-        "krules":{
-            "channel": 896877068187484181
-        },
-        "commands": {
-            "help": {
-                "description": "Show all available commands with description.",
-                "aliases": [
-                    "h"
-                ],
-                "permissions": [
-                    "Everyone"
-                ],
-                "inline": false
-            },
-            "discord_link": {
-                "description": "Send you the invitation link to this Discord Server.",
-                "aliases": [
-                    "dc_link",
-                    "dc"
-                ],
-                "permissions": [
-                    "Everyone"
-                ],
-                "inline": false
-            },
-            "server_ip": {
-                "description": "Send you the Server-IP from the Mincraft Server.",
-                "aliases": [
-                    "ip",
-                    "s_ip",
-                    "srv_ip"
-                ],
-                "permissions": [
-                    "Everyone"
-                ],
-                "inline": false
-            },
-            "social_media": {
-                "description": "Gives you all socialmedia links.",
-                "aliases": [
-                    "socialmedia",
-                    "sm"
-                ],
-                "permissions": [
-                    "Everyone"
-                ],
-                "inline": false
-            },
-            "rules": {
-                "description": "Send the rules embed",
-                "aliases": [],
-                "permissions": [
-                    "Owner"
-                ],
-                "inline": false
-            },
-            "krules": {
-                "description": "Send the kahlifar rules embed",
-                "aliases": [],
-                "permissions": [
-                    "Owner"
-                ],
-                "inline": false
-            },
-            "infos": {
-                "description": "Send the kahlifar infos messages",
-                "aliases": [],
-                "permissions": [
-                    "Owner"
-                ],
-                "inline": false
-            }
+      "token": "",
+      "prefix": "-",
+      "discord_link": "https://discord.gg/jyuPtTEGuV",
+      "server_ip": "test.play-mc.de",
+      "status": {
+        "time": 7,
+        "messages": [
+          "DiscordLink: https://discord.gg/jyuPtTEGuV",
+          "ServerIP: test.play-mc.de",
+          "NEWS: Server startet am XX.XX.XXXX"
+        ]
+      },
+      "events": {
+        "on_member_join": {
+          "role_id": 895288280269094983,
+          "channel": 814232744892301342,
+          "info_channel": 835629559645995009,
+          "verify_channel": 895385320848236574,
+          "message": "Hey, %s Willkommen auf dem Kahlifar Discord \ud83c\udf86.\nUm mit diesem Discord zu interagieren musst du dich im <#%s>-Channel verifizieren.\nIm <#%s>-Channel bekommst du Informationen \u00fcber diesen Discord und wie er funktioniert. Begib dich doch dorthin und entdecke es selber\ud83d\uddfa\ufe0f."
         }
+      },
+      "rules": {
+        "channel": 835631187094667315,
+        "message": 898204770987278436
+      },
+      "krules": {
+        "channel": 896877068187484181,
+        "message": 898203066279559168
+      },
+      "faq": {
+        "channel": 896498793711812659,
+        "message": 898202996343721984
+      },
+      "commands": {
+        "help": {
+          "description": "Show all available commands with description.",
+          "aliases": [
+            "h"
+          ],
+          "permissions": [
+            "Everyone"
+          ],
+          "inline": false
+        },
+        "discord_link": {
+          "description": "Send you the invitation link to this Discord Server.",
+          "aliases": [
+            "dc_link",
+            "dc"
+          ],
+          "permissions": [
+            "Everyone"
+          ],
+          "inline": false
+        },
+        "server_ip": {
+          "description": "Send you the Server-IP from the Mincraft Server.",
+          "aliases": [
+            "ip",
+            "s_ip",
+            "srv_ip"
+          ],
+          "permissions": [
+            "Everyone"
+          ],
+          "inline": false
+        },
+        "social_media": {
+          "description": "Gives you all socialmedia links.",
+          "aliases": [
+            "socialmedia",
+            "sm"
+          ],
+          "permissions": [
+            "Everyone"
+          ],
+          "inline": false
+        },
+        "rules": {
+          "description": "Send the rules embed",
+          "aliases": [],
+          "permissions": [
+            "Owner"
+          ],
+          "inline": false
+        },
+        "krules": {
+          "description": "Send the kahlifar rules embed",
+          "aliases": [],
+          "permissions": [
+            "Owner"
+          ],
+          "inline": false
+        },
+        "infos": {
+          "description": "Send the kahlifar infos messages",
+          "aliases": [],
+          "permissions": [
+            "Owner"
+          ],
+          "inline": false
+        },
+        "faq": {
+          "description": "Send the faq embed",
+          "aliases": [],
+          "permissions": [
+            "Owner"
+          ],
+          "inline": false
+        }
+      }
     }
-}
+  }

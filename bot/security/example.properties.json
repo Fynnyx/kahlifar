@@ -89,6 +89,16 @@
           "Owner"
         ],
         "inline": false
+      },
+      "kick": {
+        "description": "Delete messages. `clear [amount], clear all`.",
+        "aliases": [],
+        "permissions": [
+          "Helper",
+          "Moderator",
+          "Owner"
+        ],
+        "inline": false
       }
     }
   }
