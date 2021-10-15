@@ -316,7 +316,7 @@ async def ban(ctx, member, *reason):
         if await check_permissions('ban', ctx.author, ctx.channel):
             for x in reason:
                 message = message + str(x)
-            await member.send("Du wurdest gebannt (Entbannungsantrag an `Fynnyx#4024`):\nGrund: %s" % message)
+            await member.send("Du wurdest gebannt (Entbannungsantrag an `Fynnyx#4024`).\nGrund: %s" % message)
             await member.ban()
             await member.unban()
         else:
@@ -325,14 +325,18 @@ async def ban(ctx, member, *reason):
         await ctx.channel.send("Angegebener Member ist keine Member. Versuch es nochmal mit `@Member`")
 
 @client.command()
-async def kick(ctx, member:Member, *reason):
-    message = ""
-    if await check_permissions('kick', ctx.author, ctx.channel):
-        for x in reason:
-            message = message + str(x)
-        await member.send("Du wurdest gekickt:\nGrund: %s" % message)
-        await member.kick()
+async def kick(ctx, member, *reason):
+    if type(member) == discord.Member:
+        message = ""
+        if await check_permissions('kick', ctx.author, ctx.channel):
+            for x in reason:
+                message = message + str(x)
+            await member.send("Du wurdest gekick.\nGrund: %s" % message)
+            await member.ban()
+            await member.unban()
+        else:
+            await ctx.message.delete()
     else:
-        ctx.message.delete()
+        await ctx.channel.send("Angegebener Member ist keine Member. Versuch es nochmal mit `@Member`")
 
 client.run(TOKEN)
