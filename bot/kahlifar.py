@@ -52,6 +52,12 @@ async def status_task():
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
 
+@tasks.loop(seconds=10, count=None)
+async def update_json():
+    with open("properties.json") as f:
+        global data
+        data = json.load(f)
+
 
 # Functions ---------------------------------------------------------------------------
 
@@ -98,6 +104,7 @@ async def update_embed(message, embed):
 @client.event
 async def on_ready():
     status_task.start()
+    update_json.start()
     print("Kahlifar: logged in")
 
 
@@ -117,12 +124,14 @@ async def on_member_join(member):
 # Error handling ------------------------------------------------------------
 
 # @client.listen("on_error")
-async def log_error(error):
+@client.event
+async def on_error(event, *args, **kwargs):
     guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
 # @client.listen("on_command_error")
-async def log_command_error(ctx, error):
+@client.event
+async def on_command_error(ctx, error):
     guild = client.get_guild(814230131681132605)
     await log_to_console(error, guild)
 
@@ -224,7 +233,6 @@ async def infos(ctx):
         await channel.send(info["infos"]["text2"] % (835629559645995009, 838380050952486922, 835631187094667315, 863764198664175646, 896498793711812659, 815849652632027167, 836696030732877897, 836696294869041212))
         await channel.send(file=discord.File(image_path+info["infos"]["file3"]))
         await channel.send(info["infos"]["text3"] % (814231323224572006, 814234539773001778, 834483454968070164, 814523816818638868, 895288280269094983, 842867716523294741, 897781560038793226))
-    
     else:
         await ctx.message.delete()
 
