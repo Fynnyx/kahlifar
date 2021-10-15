@@ -1,5 +1,6 @@
 import discord
 from discord import Member
+from discord.abc import User
 from discord.ext import commands, tasks
 import discord.utils
 import asyncio
@@ -138,6 +139,11 @@ async def sync_roles_user(member):
                 if discord.utils.get(guild.roles, name=role) != None:
                     remove_role = discord.utils.get(guild.roles, name=role)
                     await guild_member.remove_roles(remove_role)
+
+async def send_deleted_msgs(amount, channel):
+    msg = await channel.send("🗑Deleted `%s` messages" % amount)
+    await asyncio.sleep(2)
+    await msg.delete()
 
 
 # Listerners    ----------------------------------------------------------------------------
@@ -290,11 +296,6 @@ async def clear(ctx, amount:str):
         await send_error("Please try this format -> `-clear [amount(number)]`", channel)
         return
 
-async def send_deleted_msgs(amount, channel):
-    msg = await channel.send("🗑Deleted `%s` messages" % amount)
-    await asyncio.sleep(2)
-    await msg.delete()
-
 @client.command()
 async def sync(ctx):
     try:
@@ -307,6 +308,17 @@ async def sync(ctx):
         msg = await ctx.channel.send("🔄 - Synchronization failed❌\nContact the Owner")
         await asyncio.sleep(2)
         await msg.delete()
+
+@client.command()
+async def kick(ctx, member:Member, *reason):
+    message = ""
+    if await check_permissions('kick', ctx.author, ctx.channel):
+        for x in reason:
+            message = message + str(x)
+        await member.send("Du wurdest gekickt:\nGrund: %s" % message)
+        await member.kick()
+    else:
+        ctx.message.delete()
 
 
 
