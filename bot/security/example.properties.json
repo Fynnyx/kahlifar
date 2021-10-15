@@ -71,16 +71,6 @@
         ],
         "inline": false
       },
-      "kick": {
-        "description": "Kick a Member. `kick @Member reason",
-        "aliases": [],
-        "permissions": [
-          "Helper",
-          "Moderator",
-          "Owner"
-        ],
-        "inline": false
-      },
       "ban": {
         "description": "Ban a Member. `ban @Member reason",
         "aliases": [],
