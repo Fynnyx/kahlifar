@@ -304,7 +304,7 @@ async def infos(ctx):
         await ctx.message.delete()
 
 
-# Social Media ---------------------------------------------------------------------------
+# Commands ---------------------------------------------------------------------------
 
 @client.command(pass_context=True, aliases=list(data["properties"]["commands"]["discord_link"]["aliases"]))
 async def discord_link(ctx):
@@ -319,6 +319,13 @@ async def social_media(ctx):
     sm_embed = await get_embed("social_media.json")
     await ctx.channel.send(embed=sm_embed)
 
+@client.command()
+async def author(ctx):
+    await ctx.channel.send("Freut mich dass du dich für die Herkunft des Bots interessierst.\n\nDieser Bot ist von Fynnyx gecoded.\nMöchtest du den Code des Bots sehen? Dann findest du alles unter diesem Link (https://github.com/Fynnyx/kahlifar).\nAusserdem kannst du gerne mit Fynnyx darüber reden.")
+
+@client.command()
+async def github(ctx):
+    await ctx.channel.send("**GitHub: **https://github.com/Fynnyx/kahlifar")
 
 
 
