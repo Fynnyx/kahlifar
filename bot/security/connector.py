@@ -153,7 +153,8 @@ async def on_member_join(member):
     game_guild = discord.utils.get(client.guilds, id=data["properties"]["gaming"]["guild_id"])
     game_member = discord.utils.get(game_guild.members, id=member.id)
     if game_member != None:
-        await sync_member(member)
+        await sync_roles_user(member)
+        await sync_nick(member, member.display_name)
 
 @client.event
 async def on_member_remove(member):
