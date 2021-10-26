@@ -1,0 +1,14 @@
+{
+    "embed": {
+        "title": "Social Media Links für Kahlifar",
+        "description": "Hier findest du die Social Media Links für Kahlifar",
+        "color": 9442302,
+        "fields": [
+            {
+                "name": "YouTube",
+                "value": "[YouTube](https://youtube.com)",
+                "inline": false
+            }
+        ]
+    }
+}

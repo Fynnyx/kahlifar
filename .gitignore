@@ -136,3 +136,4 @@ dmypy.json
 /test.py
 /test.json
 ./__pycache__
+./top.txt
