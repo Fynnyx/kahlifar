@@ -136,17 +136,17 @@ async def on_member_join(member):
 
 # Error handling ------------------------------------------------------------
 
-# # @client.listen("on_error")
-# @client.event
-# async def on_error(event, *args, **kwargs):
-#     guild = client.get_guild(814230131681132605)
-#     await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
+# @client.listen("on_error")
+@client.event
+async def on_error(event, *args, **kwargs):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
-# # @client.listen("on_command_error")
-# @client.event
-# async def on_command_error(ctx, error):
-#     guild = client.get_guild(814230131681132605)
-#     await log_to_console(error, guild)
+# @client.listen("on_command_error")
+@client.event
+async def on_command_error(ctx, error):
+    guild = client.get_guild(814230131681132605)
+    await log_to_console(error, guild)
 
 
 # Help Command ---------------------------------------------------------------------------
