@@ -1,3 +1,4 @@
+from datetime import datetime
 import discord
 from discord import Member
 from discord.abc import User
@@ -156,6 +157,16 @@ async def get_perms(command):
     for perm in data["properties"]["commands"][command]["permissions"]:
         perms = perms + "`" + perm + "`, "
     return perms
+
+async def mute_member(member, time, reason):
+    with open("mod.json", encoding="UTF-8") as m:
+        mod = json.load(m)
+    print(dict(mod))
+    now_time = datetime.now()
+    try:
+        mod["mutes"][str(member.id)].append({"date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "time": str(time), "reason": str(reason)})
+    except KeyError:
+        mod["mutes"][str(member.id)] = [{"date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "time": str(time), "reason": str(reason)}]
 
 
 # Listerners    ----------------------------------------------------------------------------
@@ -404,8 +415,8 @@ async def ban(ctx, member, *reason):
         await ctx.channel.send("Angegebener Member ist keine Member. Versuch es nochmal mit `@Member`")
 
 @client.command()
-async def kick(ctx, member, *reason):
-    if type(member) == discord.Member:
+async def kick(ctx, member:Member, *reason):
+    if type(member) == Member:
         message = ""
         if await check_permissions('kick', ctx.author, ctx.channel):
             for x in reason:
@@ -416,5 +427,19 @@ async def kick(ctx, member, *reason):
             await ctx.message.delete()
     else:
         await ctx.channel.send("Angegebener Member ist keine Member. Versuch es nochmal mit `@Member`")
+
+@client.command()
+async def mute(ctx, member:Member, time, *reason):
+    print(member)
+    print(time)
+    print(reason)
+    if type(member) == Member:
+        message = ""
+        if await check_permissions("mute", ctx.author, ctx.channel):
+            for x in reason:
+                message = message + str(x)
+            # await member.send("Du wurdest gemutet.\n**Mutezeit:** " + str(time) + " Minuten\n**Grund:** " + str(message))
+            await mute_member(member, time, reason)
+            print("test1")
 
 client.run(TOKEN)
