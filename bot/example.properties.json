@@ -98,6 +98,18 @@
         ],
         "inline": false
       },
+      "pcstats": {
+        "description": "Show the stats of the Server from the bot.",
+        "aliases": [
+          "raspi",
+          "respi_stats",
+          "rs"
+        ],
+        "permissions": [
+          "Everyone"
+        ],
+        "inline": false
+      },
       "rules": {
         "description": "Send the rules embed",
         "aliases": [],

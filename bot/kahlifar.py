@@ -6,6 +6,7 @@ import discord.utils
 from discord.member import Member
 import asyncio
 import json
+import platform
 
 from log import log_to_console
 
@@ -111,7 +112,6 @@ async def get_perms(command):
         perms = perms + "`" + perm + "`, "
     return perms
 
-
 # On Ready ---------------------------------------------------------------------------
 
 @client.event
@@ -136,17 +136,17 @@ async def on_member_join(member):
 
 # Error handling ------------------------------------------------------------
 
-# @client.listen("on_error")
-@client.event
-async def on_error(event, *args, **kwargs):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
+# # @client.listen("on_error")
+# @client.event
+# async def on_error(event, *args, **kwargs):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
-# @client.listen("on_command_error")
-@client.event
-async def on_command_error(ctx, error):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+# # @client.listen("on_command_error")
+# @client.event
+# async def on_command_error(ctx, error):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console(error, guild)
 
 
 # Help Command ---------------------------------------------------------------------------
@@ -175,11 +175,6 @@ async def help(ctx, user_command=""):
                 mod_perm = mod_perm + '`' + command + '`, '
             if "Owner" in data["properties"]["commands"][command]["permissions"]:
                 owner_perm = owner_perm + '`' + command + '`, '
-            
-        # print(everyone_perm)
-        # print(helper_perm)
-        # print(mod_perm)
-        # print(owner_perm)
 
         help_embed.add_field(name="Everyone:", value=everyone_perm, inline=False)
         help_embed.add_field(name="Helper:", value=helper_perm, inline=False)
@@ -327,7 +322,15 @@ async def author(ctx):
 async def github(ctx):
     await ctx.channel.send("**GitHub: **https://github.com/Fynnyx/kahlifar")
 
-
+@client.command(pass_context=True, aliases=list(data["properties"]["commands"]["pcstats"]["aliases"]))
+async def pcstats(ctx):
+    stats_embed = discord.Embed(title="Stats vom Server auf dem der Bot läuft", description="Für genauere Details frage Fynnyx der hilft dir gerne.", colour=discord.Colour.dark_purple())
+    stats_embed.add_field(name="System:", value=str(platform.system() + " " + platform.release()), inline=False)
+    stats_embed.add_field(name="System Version:", value=platform.version(), inline=False)
+    stats_embed.add_field(name="Network:", value=platform.node(), inline=False)
+    stats_embed.add_field(name="Processor:", value=platform.processor(), inline=False)
+    stats_embed.add_field(name="Python version:", value=platform.python_version(), inline=False)
+    await ctx.channel.send(embed=stats_embed)
 
 
 client.run(TOKEN)

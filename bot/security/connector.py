@@ -145,6 +145,18 @@ async def send_deleted_msgs(amount, channel):
     await asyncio.sleep(2)
     await msg.delete()
 
+async def get_aliases(command):
+    aliases = ""
+    for alias in data["properties"]["commands"][command]["aliases"]:
+        aliases = aliases + "`" + alias + "`, "
+    return aliases
+
+async def get_perms(command):
+    perms = ""
+    for perm in data["properties"]["commands"][command]["permissions"]:
+        perms = perms + "`" + perm + "`, "
+    return perms
+
 
 # Listerners    ----------------------------------------------------------------------------
 
@@ -276,6 +288,73 @@ async def send_verify():
 
 
 # Commands  ----------------------------------------------------------------------------
+@client.command(aliases=data["properties"]["commands"]["help"]["aliases"])
+async def help(ctx, user_command=""):
+    # print(user_command)
+
+    if user_command == "":
+        everyone_perm = "- "
+        helper_perm = "- "
+        mod_perm = "- "
+        owner_perm = "- "
+
+        help_embed = discord.Embed(title="Hilfe für den %s." % str(client.user.name),
+                                    description="Hier werden dir alle Rechte über die verschiedenen Commands die der <@%s> hat angezeigt.\n**PREFIX:** %s\nBenutze `%shelp COMMAND` um genauere Details zu erhalten." % (str(client.user.id), PREFIX, PREFIX),
+                                    colour=discord.Colour.dark_purple())
+        
+        for command in data["properties"]["commands"]:
+            # print(command)
+            if "Everyone" in data["properties"]["commands"][command]["permissions"]:
+                everyone_perm = everyone_perm + '`' + command + '`, '
+            if "Helper" in data["properties"]["commands"][command]["permissions"]:
+                helper_perm = helper_perm + '`' + command + '`, '
+            if "Moderator" in data["properties"]["commands"][command]["permissions"]:
+                mod_perm = mod_perm + '`' + command + '`, '
+            if "Owner" in data["properties"]["commands"][command]["permissions"]:
+                owner_perm = owner_perm + '`' + command + '`, '
+
+        help_embed.add_field(name="Everyone:", value=everyone_perm, inline=False)
+        help_embed.add_field(name="Helper:", value=helper_perm, inline=False)
+        help_embed.add_field(name="Moderator:", value=mod_perm, inline=False)
+        help_embed.add_field(name="Owner:", value=owner_perm, inline=False)
+
+        await ctx.channel.send(embed=help_embed)
+    else:
+        try:
+            aliases = await get_aliases(user_command)
+            perms = await get_perms(user_command)
+            command_help_embed = discord.Embed(title="Help für `" + user_command + "`.", 
+                                        description=data["properties"]["commands"][user_command]["description"],
+                                        color=discord.Colour.dark_purple())
+            command_help_embed.add_field(name="Aliases: ", value=aliases, inline=False)
+            command_help_embed.add_field(name="Permissions: ", value=perms, inline=False)
+            await ctx.channel.send(embed=command_help_embed)
+        except KeyError:
+            try:
+                alias_exists = False
+                for command in data["properties"]["commands"]:
+                    if user_command in data["properties"]["commands"][command]["aliases"]:
+                        alias_exists = True
+                        user_command = command
+                if alias_exists == True:
+                    aliases = await get_aliases(user_command)
+                    perms = await get_perms(user_command)
+                    command_help_embed = discord.Embed(title="Help für `" + user_command + "`.", 
+                                                description=data["properties"]["commands"][user_command]["description"],
+                                                color=discord.Colour.dark_purple())
+                    command_help_embed.add_field(name="Aliases: ", value=aliases, inline=False)
+                    command_help_embed.add_field(name="Permissions: ", value=perms, inline=False)
+                    await ctx.channel.send(embed=command_help_embed)
+                else:
+                    await send_error("Command `" + user_command + "` nicht gefunden", ctx.channel)
+                    await ctx.message.delete()
+            except KeyError:
+                await send_error("Command `" + user_command + "` nicht gefunden", ctx.channel)
+                await ctx.message.delete()
+            except:
+                await send_error("Frage beim Bot-Admin nach", ctx.channel)
+                await ctx.message.delete()
+
 
 @client.command(aliases=data["properties"]["commands"]["clear"]["aliases"])
 async def clear(ctx, amount:str):
