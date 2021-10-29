@@ -507,7 +507,7 @@ async def mute(ctx, member:Member, time, *reason):
         if await check_permissions("mute", ctx.author, ctx.channel):
             for x in reason:
                 message = message + str(x)
-            await warn_member(member, time, reason)
+            await mute_member(member, time, reason)
         else:
             await ctx.message.delete()
 
