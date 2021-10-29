@@ -1,7 +1,11 @@
 from datetime import date, datetime, timedelta
+from itertools import count
+from operator import ge, mod
 from os import pipe
 import discord
 from discord import Member
+from discord import colour
+from discord import embeds
 from discord.abc import User
 from discord.ext import commands, tasks
 import discord.utils
@@ -209,6 +213,13 @@ async def unmute_member(member):
     guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
     member = discord.utils.get(guild.members, id=int(member))
     role = discord.utils.get(guild.roles, id=data["properties"]["general"]["events"]["mute"]["role"])
+    muted = False
+    try:
+        for mute in mod["mutes"][str(member)]:
+            if mute["active"] == True:
+                muted = True
+    except KeyError:
+        await ctx.channel.send("Dieser Member hat keine Mutes")
 
     await member.remove_roles(role)
     
@@ -485,5 +496,49 @@ async def mute(ctx, member:Member, time, *reason):
                 message = message + str(x)
             # await member.send("Du wurdest gemutet.\n**Mutezeit:** " + str(time) + " Minuten\n**Grund:** " + str(message))
             await mute_member(member, time, reason)
+        else:
+            await ctx.message.delete()
+
+@client.command()
+async def mutes(ctx, member:Member=""):
+    with open("mod.json", encoding="UTF-8") as m:
+        mod = json.load(m)
+    if member != "":
+        if type(member) == Member:
+            print("")
+        else:
+            await send_error("Angegebener Member wurde nicht gefunden benutze `@Member`", ctx.channel)
+    else:
+        member = ctx.author
+
+    inactive_mutes = []
+    active_mutes = []
+    try:
+        for mute in mod["mutes"][str(member.id)]:
+            index = list(mod["mutes"][str(member.id)]).index(mute)
+            if mute["active"] == False:
+                inactive_mutes.append(mod["mutes"][str(member.id)][index])
+            elif mute["active"] == True:
+                active_mutes.append(mod["mutes"][str(member.id)][index])
+    
+        mutes_embed = (discord.Embed(title="🔇 Mutes von " + member.name,
+                                    colour=discord.Colour.dark_red()))
+        
+        mutes_embed.add_field(name="Insgesamte vergangene Mutes:", 
+                                value=len(inactive_mutes),
+                                inline=False)
+        mutes_embed.add_field(name="\u200b",
+                                value="-----------------------",
+                                inline=False)
+        count = 0
+        for mute in active_mutes:
+            count = count + 1
+            mutes_embed.add_field(name="Aktiver Mute #" + str(count), 
+                                    value="Erstellt am: " + mute["date"] + "\nZeit: " + str(mute["time"]) + "\nGrund: " + str(mute["reason"]),
+                                    inline=False)
+        await ctx.channel.send(embed=mutes_embed)
+    except KeyError:
+        await ctx.channel.send("Dieser User hat keine Mutes")
+
 
 client.run(TOKEN)
