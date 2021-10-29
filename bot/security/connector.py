@@ -198,6 +198,7 @@ async def mute_member(member, time, reason):
         mod["mutes"][str(member.id)] = [{"active": True, "date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "time": str(time), "reason": str(reason_msg)}]
     guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
     role = discord.utils.get(guild.roles, id=data["properties"]["general"]["events"]["mute"]["role"])
+    await member.send("Du wurdest für " + str(time) + "gemutet.\nGrund: " + str(reason) + "\nMelde dich bei Fynnyx#4024 bei Unklarheiten.")
     await member.add_roles(role)
     with open("mod.json", "w") as m:
         m.write(json.dumps(mod, indent=2))
