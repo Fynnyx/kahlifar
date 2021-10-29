@@ -66,17 +66,10 @@ async def check_muted():
                 mute_time = datetime.strptime(mute["date"], "%a %d %B %Y - %H:%M:%S")
                 now_time = datetime.now()
                 diffrence_time = now_time - mute_time
-                print(diffrence_time)
                 if mute_time < now_time:
-                    # diffrence_time = datetime.strptime(str(diffrence_time), "%H:%M:%S.%s")
-                    # wait_time = datetime.strptime(str(mod["mutes"][str(user)][index]["time"]), "%H:%M:%S")
-                    # diffrence_time = timedelta(minutes=str(diffrence_time))
-                    # wait_time = timedelta(minutes=str(mod["mutes"][str(user)][index]["time"]))
                     wait_time = timedelta(minutes=int(mod["mutes"][str(user)][index]["time"]))
-                    print(wait_time)
                     if diffrence_time > wait_time:
                         print("is 10")
-                        print(wait_time)
                         mod["mutes"][str(user)][index]["active"] = False
                         await unmute_member(user)
     with open("mod.json", "w") as m:
@@ -209,19 +202,41 @@ async def mute_member(member, time, reason):
     with open("mod.json", "w") as m:
         m.write(json.dumps(mod, indent=2))
 
-async def unmute_member(member):
+async def unmute_member(member, channel=""):
+    with open("mod.json", encoding="UTF-8") as m:
+        mod = json.load(m)
     guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
     member = discord.utils.get(guild.members, id=int(member))
     role = discord.utils.get(guild.roles, id=data["properties"]["general"]["events"]["mute"]["role"])
     muted = False
     try:
-        for mute in mod["mutes"][str(member)]:
+        for mute in mod["mutes"][str(member.id)]:
+            print(mute)
             if mute["active"] == True:
                 muted = True
     except KeyError:
-        await ctx.channel.send("Dieser Member hat keine Mutes")
+        if channel != "":
+            await channel.send("Dieser Member hat keine Mutes")
+    if muted == True:
+        await member.remove_roles(role)
 
-    await member.remove_roles(role)
+async def warn_member(member, reason):
+    with open("mod.json", encoding="UTF-8") as m:
+        mod = json.load(m)
+    print(dict(mod))
+    now_time = datetime.now()
+    reason_msg = ""
+    for x in reason:
+        reason_msg = reason_msg + x
+    try:
+        mod["warns"][str(member.id)].append({"date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "reason": str(reason_msg)})
+    except KeyError:
+        mod["warns"][str(member.id)] = [{"date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "reason": str(reason_msg)}]
+    guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    role = discord.utils.get(guild.roles, id=data["properties"]["general"]["events"]["mute"]["role"])
+    await member.add_roles(role)
+    with open("mod.json", "w") as m:
+        m.write(json.dumps(mod, indent=2))
     
 
 # Listerners    ----------------------------------------------------------------------------
@@ -486,16 +501,12 @@ async def kick(ctx, member:Member, *reason):
 
 @client.command()
 async def mute(ctx, member:Member, time, *reason):
-    print(member)
-    print(time)
-    print(reason)
     if type(member) == Member:
         message = ""
         if await check_permissions("mute", ctx.author, ctx.channel):
             for x in reason:
                 message = message + str(x)
-            # await member.send("Du wurdest gemutet.\n**Mutezeit:** " + str(time) + " Minuten\n**Grund:** " + str(message))
-            await mute_member(member, time, reason)
+            await warn_member(member, time, reason)
         else:
             await ctx.message.delete()
 
@@ -505,12 +516,11 @@ async def mutes(ctx, member:Member=""):
         mod = json.load(m)
     if member != "":
         if type(member) == Member:
-            print("")
+            member = member
         else:
             await send_error("Angegebener Member wurde nicht gefunden benutze `@Member`", ctx.channel)
     else:
         member = ctx.author
-
     inactive_mutes = []
     active_mutes = []
     try:
@@ -539,6 +549,50 @@ async def mutes(ctx, member:Member=""):
         await ctx.channel.send(embed=mutes_embed)
     except KeyError:
         await ctx.channel.send("Dieser User hat keine Mutes")
+
+@client.command()
+async def warn(ctx, member:Member, *reason):
+    if type(member) == Member:
+        message = ""
+        if await check_permissions("warn", ctx.author, ctx.channel):
+            for x in reason:
+                message = message + str(x) + " "
+            await warn_member(member, reason)
+        else:
+            await ctx.message.delete()
+
+@client.command()
+async def warns(ctx, member:Member=""):
+    with open("mod.json", encoding="UTF-8") as m:
+        mod = json.load(m)
+    if member != "":
+        if type(member) == Member:
+            member = member
+        else:
+            await send_error("Angegebener Member wurde nicht gefunden benutze `@Member`", ctx.channel)
+    else:
+        member = ctx.author
+    try:
+        warns = mod["warns"][str(member.id)]
+        warns_embed = (discord.Embed(title="⚠ Warns von " + member.name,
+                                    colour=discord.Colour.dark_red()))
+        
+        warns_embed.add_field(name="Insgesamte Warns:",
+                                value=len(warns),
+                                inline=False)
+        warns_embed.add_field(name="\u200b",
+                                value="-----------------------",
+                                inline=False)
+        count = 0
+        for mute in mod["warns"][str(member.id)]:
+            # index = list(mod["warns"][str(member.id)]).index(mute)
+            count = count + 1
+            warns_embed.add_field(name="Warn #" + str(count), 
+                                    value="Erstellt am: " + mute["date"] + "\nGrund: " + str(mute["reason"]),
+                                    inline=False)
+        await ctx.channel.send(embed=warns_embed)
+    except KeyError:
+        await ctx.channel.send("Dieser User hat keine Warns")
 
 
 client.run(TOKEN)
