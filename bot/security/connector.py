@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import date, datetime, timedelta
+from os import pipe
 import discord
 from discord import Member
 from discord.abc import User
@@ -49,6 +50,34 @@ async def status_task():
         for x in range(len(messages)):
             await client.change_presence(activity=discord.Game(name=messages[x]))
             await asyncio.sleep(time)
+
+@tasks.loop(count=None, seconds=5)
+async def check_muted():
+    with open("mod.json", "r") as m:
+        mod = json.load(m)
+    for user in mod["mutes"]:
+        for mute in mod["mutes"][str(user)]:
+            if mute["active"] == True:
+                index = list(mod["mutes"][str(user)]).index(mute)
+                mute_time = datetime.strptime(mute["date"], "%a %d %B %Y - %H:%M:%S")
+                now_time = datetime.now()
+                diffrence_time = now_time - mute_time
+                print(diffrence_time)
+                if mute_time < now_time:
+                    # diffrence_time = datetime.strptime(str(diffrence_time), "%H:%M:%S.%s")
+                    # wait_time = datetime.strptime(str(mod["mutes"][str(user)][index]["time"]), "%H:%M:%S")
+                    # diffrence_time = timedelta(minutes=str(diffrence_time))
+                    # wait_time = timedelta(minutes=str(mod["mutes"][str(user)][index]["time"]))
+                    wait_time = timedelta(minutes=int(mod["mutes"][str(user)][index]["time"]))
+                    print(wait_time)
+                    if diffrence_time > wait_time:
+                        print("is 10")
+                        print(wait_time)
+                        mod["mutes"][str(user)][index]["active"] = False
+                        await unmute_member(user)
+    with open("mod.json", "w") as m:
+        m.write(json.dumps(mod, indent=2))
+    
 
 
 # Functions ---------------------------------------------------------------------------
@@ -163,11 +192,26 @@ async def mute_member(member, time, reason):
         mod = json.load(m)
     print(dict(mod))
     now_time = datetime.now()
+    reason_msg = ""
+    for x in reason:
+        reason_msg = reason_msg + x
     try:
-        mod["mutes"][str(member.id)].append({"date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "time": str(time), "reason": str(reason)})
+        mod["mutes"][str(member.id)].append({"active": True, "date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "time": str(time), "reason": str(reason_msg)})
     except KeyError:
-        mod["mutes"][str(member.id)] = [{"date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "time": str(time), "reason": str(reason)}]
+        mod["mutes"][str(member.id)] = [{"active": True, "date": str(now_time.strftime("%a %d %B %Y - %H:%M:%S")), "time": str(time), "reason": str(reason_msg)}]
+    guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    role = discord.utils.get(guild.roles, id=data["properties"]["general"]["events"]["mute"]["role"])
+    await member.add_roles(role)
+    with open("mod.json", "w") as m:
+        m.write(json.dumps(mod, indent=2))
 
+async def unmute_member(member):
+    guild = discord.utils.get(client.guilds, id=data["properties"]["general"]["guild_id"])
+    member = discord.utils.get(guild.members, id=int(member))
+    role = discord.utils.get(guild.roles, id=data["properties"]["general"]["events"]["mute"]["role"])
+
+    await member.remove_roles(role)
+    
 
 # Listerners    ----------------------------------------------------------------------------
 
@@ -263,17 +307,17 @@ async def on_member_unban(guild, user):
 
 # Error handling ------------------------------------------------------------
 
-# @client.listen("on_error")
-@client.event
-async def on_error(event, *args, **kwargs):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
+# # @client.listen("on_error")
+# @client.event
+# async def on_error(event, *args, **kwargs):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console("Error in " + event + "\nMore: " + args + "\n\n" + kwargs, guild)
 
-# @client.listen("on_command_error")
-@client.event
-async def on_command_error(ctx, error):
-    guild = client.get_guild(814230131681132605)
-    await log_to_console(error, guild)
+# # @client.listen("on_command_error")
+# @client.event
+# async def on_command_error(ctx, error):
+#     guild = client.get_guild(814230131681132605)
+#     await log_to_console(error, guild)
 
 # On Ready  ----------------------------------------------------------------------------
 
@@ -281,6 +325,7 @@ async def on_command_error(ctx, error):
 async def on_ready():
     print("%sKahlifar Security: logged in" % PREFIX)
     status_task.start()
+    check_muted.start()
     await send_verify()
 
 async def send_verify():
@@ -440,6 +485,5 @@ async def mute(ctx, member:Member, time, *reason):
                 message = message + str(x)
             # await member.send("Du wurdest gemutet.\n**Mutezeit:** " + str(time) + " Minuten\n**Grund:** " + str(message))
             await mute_member(member, time, reason)
-            print("test1")
 
 client.run(TOKEN)
