@@ -23,13 +23,16 @@
           "verify": {
             "channel": 895385320848236574,
             "role": 814523816818638868,
-            "message_id": 902930803258949663,
+            "message_id": 903721696979210280,
             "emoji": "\u2705",
             "message": "By clicking/tapping the %s you agree with the rules on this Server."
           }
         },
         "sync_member": {
           "nv_message": "Please verify\u2705 yourself first on the General Discord.\n%s"
+        },
+        "mute": {
+          "role": 903506138329391166
         }
       }
     },
@@ -112,9 +115,34 @@
         "description": "Mute a member `mute @Member TIME REASON`",
         "aliases": [],
         "permissions": [
+          "Moderator",
+          "Owner"
+        ],
+        "inline": false
+      },
+      "warn": {
+        "description": "Warn a member `warn @Member REASON`",
+        "aliases": [],
+        "permissions": [
           "Helper",
           "Moderator",
           "Owner"
+        ],
+        "inline": false
+      },
+      "warns": {
+        "description": "Warn a member `warns @Member`",
+        "aliases": [],
+        "permissions": [
+          "Everyone"
+        ],
+        "inline": false
+      },
+      "mutes": {
+        "description": "Warn a member `mutes @Member`",
+        "aliases": [],
+        "permissions": [
+          "Everyone"
         ],
         "inline": false
       }
