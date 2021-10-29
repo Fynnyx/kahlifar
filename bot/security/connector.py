@@ -585,11 +585,11 @@ async def warns(ctx, member:Member=""):
                                 value="-----------------------",
                                 inline=False)
         count = 0
-        for mute in mod["warns"][str(member.id)]:
+        for warn in mod["warns"][str(member.id)]:
             # index = list(mod["warns"][str(member.id)]).index(mute)
             count = count + 1
             warns_embed.add_field(name="Warn #" + str(count), 
-                                    value="Erstellt am: " + mute["date"] + "\nGrund: " + str(mute["reason"]),
+                                    value="Erstellt am: " + warn["date"] + "\nGrund: " + str(warn["reason"]),
                                     inline=False)
         await ctx.channel.send(embed=warns_embed)
     except KeyError:
