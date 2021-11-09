@@ -131,8 +131,6 @@ async def on_member_join(member):
     for role in data["properties"]["events"]["on_member_join"]["roles"]:
         role = discord.utils.get(member.guild.roles, id=int(role))
         await member.add_roles(role)
-        print("TEST")
-    print("askjd")
     await welcome_channel.send(welcome_message % (str(member.mention), str(verify_channel.id), str(info_channel.id)))
 
 

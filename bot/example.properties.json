@@ -9,12 +9,15 @@
       "messages": [
         "DiscordLink: https://discord.gg/jyuPtTEGuV",
         "ServerIP: test.play-mc.de",
-        "NEWS: Server startet am XX.XX.XXXX"
+        "NEWS: Server startet mit der 1.18"
       ]
     },
     "events": {
       "on_member_join": {
-        "role_id": 895288280269094983,
+        "roles": [
+          895288280269094983,
+          907650557613858867
+        ],
         "channel": 814232744892301342,
         "info_channel": 835629559645995009,
         "verify_channel": 895385320848236574,
