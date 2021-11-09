@@ -1,5 +1,4 @@
 import discord
-from discord import embeds
 from discord.errors import NotFound
 from discord.ext import commands, tasks
 import discord.utils
@@ -129,8 +128,11 @@ async def on_member_join(member):
     welcome_message = data["properties"]["events"]["on_member_join"]["message"]
     info_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["info_channel"])
     verify_channel = discord.utils.get(member.guild.channels, id=data["properties"]["events"]["on_member_join"]["verify_channel"])
-    basic_member_role = discord.utils.get(member.guild.roles, id=int(data["properties"]["events"]["on_member_join"]["role_id"]))
-    await member.add_roles(basic_member_role)
+    for role in data["properties"]["events"]["on_member_join"]["roles"]:
+        role = discord.utils.get(member.guild.roles, id=int(role))
+        await member.add_roles(role)
+        print("TEST")
+    print("askjd")
     await welcome_channel.send(welcome_message % (str(member.mention), str(verify_channel.id), str(info_channel.id)))
 
 
