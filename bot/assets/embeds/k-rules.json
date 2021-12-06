@@ -16,7 +16,22 @@
             },
             {
                 "name": "- §03 -",
-                "value": "Bugabusing welche dir einen Spielvorteil verschaffen sind nicht erlaubt.",
+                "value": "Jede Shopart darf nur einmal benutzt werden und die Grösse sollte sich beschränken. (Gold **ok**, Sealantern **ok**, Alle Blöcke **nicht ok**)",
+                "inline": false
+            },
+            {
+                "name": "- §04 -",
+                "value": "Bugabusing welche dir einen Spielvorteil verschaffen sind nicht erlaubt. (Netherdecke ist ok)",
+                "inline": false
+            },
+            {
+                "name": "- §05 -",
+                "value": "Sei nicht unfair gegenüber anderen.",
+                "inline": false
+            },
+            {
+                "name": "- §06 -",
+                "value": "Griefing oder klauen von Items ist solange ok wenn beide Parteien einverstanden sind.",
                 "inline": false
             },
             {
